@@ -129,7 +129,7 @@ export function generateLocalChatReply(
     `• **CUM:** escribe "¿cómo mejorar mi CUM?"\n` +
     `• **CV:** escribe "ayúdame con mi CV"\n` +
     `• **Pasantías:** escribe "oportunidades en Bridge"\n\n` +
-    `Configura una API key de OpenAI en \`.env.local\` para respuestas aún más detalladas; mientras tanto sigo ayudándote con tus datos reales de la plataforma.`
+    `Por ahora respondo con la información real de tu perfil en la plataforma. ¿En qué más te puedo ayudar?`
   );
 }
 
