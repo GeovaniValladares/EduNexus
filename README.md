@@ -1,46 +1,43 @@
-# Astro Starter Kit: Basics
+# Edunexus — Plataforma ULS
 
-```sh
-npm create astro@latest -- --template basics
+Plataforma web para estudiantes de la Universidad Luterana Salvadoreña: gestión académica, orientación con IA, oportunidades laborales y panel personal.
+
+## Módulos
+
+- **Wiki** — materias, horarios e inscripciones
+- **Lía** — asistente con IA, plan personalizado y CV
+- **Bridge** — pasantías, proyectos y postulaciones
+- **Panel** — resumen académico, trámites y perfil
+
+## Requisitos
+
+- Node.js >= 22.12.0
+- npm
+
+## Inicio rápido
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Opcional: añade `GROQ_API_KEY` en `.env.local` para activar la IA en Lía.
 
-## 🚀 Project Structure
+## Scripts útiles
 
-Inside of your Astro project, you'll see the following folders and files:
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run db:seed` | Datos de ejemplo |
+| `npm run ai:test` | Probar conexión IA |
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+## Stack
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+Astro 6, React, Tailwind CSS 4, Astro DB, Lucia Auth, Lucide Icons.
 
-## 🧞 Commands
+## Licencia
 
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Proyecto académico — ULS.
+# EduNexus
