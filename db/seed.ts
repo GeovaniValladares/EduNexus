@@ -1,5 +1,5 @@
 import { db, User, eq } from 'astro:db';
-import argon2 from 'argon2';
+import { hash } from '@node-rs/argon2';
 import { seedWiki } from './seed-wiki';
 import { seedBridge } from './seed-bridge';
 
@@ -60,7 +60,7 @@ export default async function seed() {
   // 1. Seed Default Demo Admin
   const existingAdmin = await db.select().from(User).where(eq(User.email, ADMIN_EMAIL.toLowerCase())).get();
   if (!existingAdmin) {
-    const hashed = await argon2.hash(ADMIN_PASSWORD);
+    const hashedPassword = await hash(ADMIN_PASSWORD);
     await db.insert(User).values({
       id: ADMIN_ID,
       email: ADMIN_EMAIL.toLowerCase(),
@@ -68,7 +68,7 @@ export default async function seed() {
       carrera: 'Licenciatura en Administración de Empresas',
       ciclo: 'X',
       perfilCompleto: true,
-      hashedPassword: hashed,
+      hashedPassword: hashedPassword,
       role: 'superadmin',
       cvText: '', cvData: '', createdAt: new Date(),
     });
@@ -78,7 +78,7 @@ export default async function seed() {
   // 2. Seed Default Demo Docente
   const existingDoc = await db.select().from(User).where(eq(User.email, DOCENTE_EMAIL)).get();
   if (!existingDoc) {
-    const hashed = await argon2.hash(DOCENTE_PASSWORD);
+    const hashedPassword = await hash(DOCENTE_PASSWORD);
     await db.insert(User).values({
       id: DOCENTE_ID,
       email: DOCENTE_EMAIL,
@@ -86,7 +86,7 @@ export default async function seed() {
       carrera: 'Licenciatura en Ingeniería en Sistemas Informáticos',
       ciclo: 'X',
       perfilCompleto: true,
-      hashedPassword: hashed,
+      hashedPassword: hashedPassword,
       role: 'docente',
       cvText: '', cvData: '', createdAt: new Date(),
     });
@@ -97,13 +97,13 @@ export default async function seed() {
   for (const u of TEST_USERS) {
     const exists = await db.select().from(User).where(eq(User.email, u.email)).get();
     if (!exists) {
-      const hashed = await argon2.hash(u.password);
+      const hashedPassword = await hash(u.password);
       await db.insert(User).values({
         id: u.id,
         email: u.email,
         nombre: u.nombre,
         carrera: u.carrera,
-        hashedPassword: hashed,
+        hashedPassword: hashedPassword,
         role: u.role as any,
         perfilCompleto: true,
         cvText: '', cvData: '', createdAt: new Date(),

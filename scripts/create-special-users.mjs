@@ -1,5 +1,5 @@
 import { db, User, eq } from 'astro:db';
-import argon2 from 'argon2';
+import { hash } from '@node-rs/argon2';
 import { generateId } from 'lucia';
 import { guardarUsuariosEnSnapshot } from '../src/lib/db-persist.ts';
 
@@ -33,7 +33,7 @@ async function createSpecialUsers() {
       await db.update(User).set({ role: u.role as any }).where(eq(User.id, existing.id));
     } else {
       console.log(`[setup] Creando nuevo usuario ${u.role}: ${u.email}`);
-      const hashedPassword = await argon2.hash(u.password);
+      const hashedPassword = await hash(u.password);
       await db.insert(User).values({
         id: u.id,
         email: u.email,

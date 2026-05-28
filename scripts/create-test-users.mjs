@@ -1,12 +1,12 @@
 import { db, User, eq } from 'astro:db';
-import argon2 from 'argon2';
+import { hash } from '@node-rs/argon2';
 import { guardarUsuariosEnSnapshot } from '../src/lib/db-persist.ts';
 
 async function createTestUsers() {
   console.log('[setup] Creando usuarios de prueba para todos los roles...');
 
   const password = '12345678';
-  const hashedPassword = await argon2.hash(password);
+  const hashedPassword = await hash(password);
   
   const testUsers = [
     {
