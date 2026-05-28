@@ -1,0 +1,671 @@
+MAPEO DE CARRERAS Y MATERIAS - UNIVERSIDAD LUTERANA SALVADOREÑA
+
+================================================================================
+FACULTAD DE CIENCIAS DEL HOMBRE Y LA NATURALEZA
+================================================================================
+
+--------------------------------------------------------------------------------
+INGENIERÍA AGROECOLÓGICA
+--------------------------------------------------------------------------------
+Ciclo I:
+- Matemática I
+- Sociología General
+- Química General
+- Biología General
+- Inglés Técnico
+
+Ciclo II:
+- Matemática II
+- Informática
+- Química Orgánica
+- Botánica Agrícola
+- Ética
+
+Ciclo III:
+- Estadística
+- Técnicas de Investigación
+- Bioquímica
+- Nuevas Tecnologías en Agroecología
+- Microbiología Agrícola
+
+Ciclo IV:
+- Física General
+- Fitopatología General
+- Fisiología Vegetal
+- Edafología
+- Entomología
+
+Ciclo V:
+- Agroecología
+- Principios de Riego
+- Anatomía y Fisiología Animal
+- Cultivos Orgánicos
+- Genética
+
+Ciclo VI:
+- Topografía
+- Sanidad Animal
+- Zootecnia I
+- Práctica Agroecológica I
+
+Ciclo VII:
+- Economía
+- Diseños Experimentales
+- Zootecnia II
+- Práctica Agroecológica II
+
+Ciclo VIII:
+- Sistemas de Información Geográfica
+- Ecología y Agroclimatología
+- Zootecnia III
+- Práctica Agroecológica III
+
+Ciclo IX:
+- Legislación Ambiental
+- Administración Agroecológica
+- Práctica Pecuaria
+- Agricultura de Precisión
+
+Ciclo X:
+- Gerencia de Proyectos
+- Cambio Climático y Gestión de Riesgo
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN ADMINISTRACIÓN DE EMPRESAS
+--------------------------------------------------------------------------------
+Ciclo I:
+- Contabilidad Financiera I
+- Sociología General
+- Matemática I
+- Psicología General
+- Filosofía General
+
+Ciclo II:
+- Contabilidad Financiera II
+- Inglés
+- Matemática II
+- Economía
+- Ética y Responsabilidad Social Empresarial
+
+Ciclo III:
+- Contabilidad de Costos
+- Planificación de la Producción
+- Matemática Financiera
+- Microeconomía
+- Fundamentos de Administración
+
+Ciclo IV:
+- Administración Turística
+- Derecho Mercantil
+- Redacción de Informes Gerenciales
+- Macroeconomía
+- Técnicas de Investigación
+
+Ciclo V:
+- Administración Financiera
+- Derecho Laboral
+- Informática
+- Gerencia del Talento Humano
+- Estadística
+
+Ciclo VI:
+- Administración Pública
+- Auditoría Interna
+- Sistemas de Información y Bases de Datos
+- Gerencia de Proyectos
+- Emprendimiento e Innovación Empresarial
+
+Ciclo VII:
+- Economía Internacional
+- Marketing Estratégico
+- Inteligencia de Negocios
+- Gerencia de Compras
+- Consultoría Empresarial
+
+Ciclo VIII:
+- Comercio y Negocios Internacionales
+- Marketing Digital
+- Inteligencia Artificial Aplicada a los Negocios
+- Gerencia de Ventas
+
+Ciclo IX:
+- Logística y Aduanas
+- Investigación de Mercados
+- Inglés Técnico
+- Banca y Finanzas
+
+Ciclo X:
+- Seminario de Alta Gerencia
+- Práctica Profesional
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN CIENCIAS DE LA COMPUTACIÓN
+--------------------------------------------------------------------------------
+Ciclo I:
+- Introducción al Hardware
+- Inglés
+- Algoritmo
+- Introducción al Software Libre
+- Filosofía General
+
+Ciclo II:
+- Matemática I
+- Programación Orientada a Objetos
+- Ingeniería de Software
+- Inglés Técnico
+- Ética y Responsabilidad Social Empresarial
+
+Ciclo III:
+- Fundamentos de Redes
+- Desarrollo Web
+- Investigación Científica
+- Base de Datos
+- Matemática II
+
+Ciclo IV:
+- Configuración de Dispositivos de Redes
+- Proyectos de Aplicaciones Web
+- Desarrollo Móvil
+- Análisis de Datos y Reportería Estratégica
+- Robótica Educativa
+
+Ciclo V:
+- Economía
+- Seguridad Informática
+- Proyectos de Aplicaciones Móviles
+- Herramientas de Inteligencia Artificial para el Desarrollo Web
+- Ecología, Gestión y Mitigación de Riesgos
+
+Ciclo VI:
+- Fundamentos de Administración
+- Redacción y Ortografía
+- Nuevas Tendencias de Programación
+- Contabilidad Financiera I
+
+Ciclo VII:
+- Derecho Laboral
+- Marketing Digital
+- Proyectos de Nuevas Tendencias de Programación
+
+Ciclo VIII:
+- Consultoría Empresarial
+- Empresas y Cooperativas de Software
+- Gerencia de Proyectos
+
+Ciclo IX:
+- Administración de Sistemas Informáticos
+- Proyectos de Software Libre
+- Proyectos Ágiles
+
+Ciclo X:
+- Práctica Profesional Informática
+- Auditoría de Sistemas
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN CIENCIAS JURÍDICAS
+--------------------------------------------------------------------------------
+Ciclo I:
+- Técnicas de Redacción y Ortografía
+- Introducción al Estudio del Derecho I
+- Filosofía General
+- Técnicas de Investigación
+- Sociología General
+
+Ciclo II:
+- Introducción al Estudio del Derecho II
+- Historia del Derecho
+- Introducción al Estudio del Derecho Procesal
+- Informática
+- Inglés
+
+Ciclo III:
+- Derecho Civil: Bienes
+- Derechos Humanos
+- Ética Profesional
+- Derecho Ambiental
+- Derecho Constitucional I
+
+Ciclo IV:
+- Derecho Civil: Obligaciones
+- Derecho Procesal Civil y Mercantil I
+- Derecho Penal I
+- Derecho de Familia
+- Derecho Constitucional II
+
+Ciclo V:
+- Derecho Mercantil I
+- Derecho Civil: Contratos
+- Derecho Procesal Civil y Mercantil II
+- Derecho Penal II
+- Derecho Laboral I
+
+Ciclo VI:
+- Derecho Procesal de Familia
+- Derecho Civil: Sucesiones
+- Derecho Mercantil II
+- Derecho Procesal Penal I
+- Derecho Laboral II
+
+Ciclo VII:
+- Derecho Procesal Civil y Mercantil III
+- Derecho Registral
+- Derecho Mercantil III
+- Derecho Procesal Penal II
+- Derecho Procesal Laboral
+
+Ciclo VIII:
+- Derecho Administrativo I
+- Derecho de Niñez y Adolescencia
+- Derecho Internacional Privado
+- Derecho Internacional Público
+
+Ciclo IX:
+- Derecho Administrativo II
+- Derecho Tributario
+- Criminología y Medicina Forense
+- Derecho Notarial
+
+Ciclo X:
+- Oratoria Forense
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN CONTADURÍA PÚBLICA
+--------------------------------------------------------------------------------
+Ciclo I:
+- Contabilidad Financiera I
+- Sociología General
+- Matemática I
+- Psicología General
+- Filosofía General
+
+Ciclo II:
+- Contabilidad Financiera II
+- Inglés
+- Matemática II
+- Economía
+- Ética y Responsabilidad Social Empresarial
+
+Ciclo III:
+- Contabilidad Financiera III
+- Contabilidad de Costos
+- Matemática Financiera
+- Microeconomía
+- Fundamentos de Administración
+
+Ciclo IV:
+- Contabilidad Financiera IV
+- Derecho Mercantil
+- Redacción de Informes Gerenciales
+- Macroeconomía
+- Técnicas de Investigación
+
+Ciclo V:
+- Contabilidad Financiera V
+- Derecho Laboral
+- Informática
+- Administración Financiera
+- Estadística
+
+Ciclo VI:
+- Auditoría Interna
+- Derecho Aduanero
+- Sistemas de Información y Bases de Datos
+- Gerencia de Proyectos
+- Emprendimiento e Innovación Empresarial
+
+Ciclo VII:
+- Auditoría Financiera I
+- Derecho Tributario I
+- Inteligencia de Negocios
+- Contabilidades Especiales
+- Consultoría Empresarial
+
+Ciclo VIII:
+- Auditoría Financiera II
+- Derecho Tributario II
+- Sistemas Contables Computarizados
+- Contabilidad Gubernamental
+
+Ciclo IX:
+- Auditoría Forense
+- Auditoría Fiscal
+- Auditoría de Sistemas Contables Computarizados
+- Auditoría Gubernamental
+
+Ciclo X:
+- Seminario de Actualización Contable
+- Práctica Profesional
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+TÉCNICO EN DESARROLLO DE APLICACIONES INFORMÁTICAS
+--------------------------------------------------------------------------------
+Ciclo I:
+- Diseño de aplicaciones basadas en experiencias del usuario
+- Aplicación del pensamiento computacional
+- Gestión de proyectos de desarrollo de software
+- Práctica de valores en distintos contextos
+- Redacción de documentos técnicos
+
+Ciclo II:
+- Desarrollo de aplicaciones web
+- Implementación de servidores
+- Producción de contenido multimedia
+- Desarrollo de aplicaciones móviles
+- Técnicas para conversar en inglés
+
+Ciclo III:
+- Desarrollo de aplicaciones híbridas y multiplataforma
+- Ejecución de pruebas de seguridad
+- Herramientas de inteligencia artificial para el desarrollo móvil
+- Implementación de modelos de negocios
+- Técnicas para redactar en inglés
+
+Ciclo IV:
+- Evaluación de la calidad de software
+- Proyectos de aplicaciones híbridas y multiplataforma
+- Ejecución de pruebas de validación y depuración
+- Diseño de estrategias para el marketing móvil
+- Respeto a los derechos humanos y propiedad intelectual
+
+--------------------------------------------------------------------------------
+TÉCNICO EN INGENIERÍA AGROECOLÓGICA
+--------------------------------------------------------------------------------
+Ciclo I:
+- Agroecología
+- Insumos Orgánicos
+- Gerencia de Proyectos
+- Bases de Producción Animal
+- Inglés Técnico I
+
+Ciclo II:
+- Manejo de Plagas I
+- Manejo de Suelo I
+- Cambio Climático y Gestión de Riesgo
+- Producción Animal I
+- Inglés Técnico II
+
+Ciclo III:
+- Manejo de Plagas II
+- Manejo de Suelo II
+- Emprendedurismo Aplicado a la Agroecología
+- Producción Animal II
+- Nuevas Tecnologías en Agroecología
+
+Ciclo IV:
+- Manejo de Agroecosistemas
+- Sistemas de Riego
+- Procesamiento de alimentos
+- Sanidad Animal
+
+
+================================================================================
+FACULTAD DE TEOLOGIA Y HUMANIDADES
+================================================================================
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN IDIOMA INGLÉS
+--------------------------------------------------------------------------------
+Ciclo I:
+- Inglés Intensivo I
+- Sociología General
+- Técnicas de Redacción y Ortografía
+- Psicología General
+- Filosofía General
+
+Ciclo II:
+- Inglés Intensivo II
+- Comprensión Auditiva I
+- Informática
+- Ética Profesional
+
+Ciclo III:
+- Inglés Intensivo III
+- Comprensión Auditiva II
+- Gramática Inglesa I
+- Comprensión Lectora
+
+Ciclo IV:
+- Inglés Intensivo IV
+- Métodos y Técnicas para la Enseñanza del Idioma Inglés
+- Gramática Inglesa II
+- Historia y Cultura Británica y Norteamericana
+
+Ciclo V:
+- Inglés Intensivo V
+- Diseño e Implementación de Planes de Clase
+- Gramática Comparada Inglés/Español
+- Literatura Británica y Norteamericana
+
+Ciclo VI:
+- Introducción a la Traducción I
+- Métodos y Técnicas de Evaluación de los Aprendizajes
+- Pronunciación y Oratoria en Inglés
+- Técnicas de Redacción en Inglés I
+
+Ciclo VII:
+- Introducción a la Traducción II
+- Diseño Curricular
+- Técnicas de Investigación
+- Técnicas de Redacción en Inglés II
+
+Ciclo VIII:
+- Introducción a la Interpretación I
+- Formulación de Proyectos Orientados al Idioma Inglés
+- Psicología del Trabajo
+
+Ciclo IX:
+- Introducción a la Interpretación II
+- Práctica Profesional I
+
+Ciclo X:
+- Preparación para Pruebas Estandarizadas
+- Práctica Profesional II
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN PSICOLOGÍA
+--------------------------------------------------------------------------------
+Ciclo I:
+- Respeto a los derechos humanos y propiedad intelectual
+- Prácticas de valores en distintos contextos
+- Utilización de técnicas para conversar en inglés
+- Desarrollo de habilidades sociales
+
+Ciclo II:
+- Aplicación de enfoque de integralidad humana
+- Investigación en fuentes secundarias
+- Identificación de bases neurológicas del comportamiento y procesos psicológicos
+- Utilización de técnicas para redactar en inglés
+- La psicología en la historia
+
+Ciclo III:
+- Medición de variables psicológicas en distintos contextos
+- Manejo de procesos normales y anormales de la neuropsicología
+- Aplicación de enfoques del aprendizaje humano
+- Estrategias y prácticas preventivas
+- Aplicación de enfoque de desarrollo psicológico humano
+
+Ciclo IV:
+- Planificación y diseño de la investigación
+- Identificación clínica, síntomas y signos
+- Procesos para la convivencia escolar
+- Entrevista en psicología clínica
+- Análisis psicosocial comunitario
+
+Ciclo V:
+- Aplicación de métodos y técnicas de investigación en psicología
+- La psicología en las organizaciones
+- Análisis de procesos de resiliencia
+- Manejo de enfoques y procesos terapéuticos clínicos básicos
+- Aplicación e interpretación de pruebas psicométricas
+
+Ciclo VI:
+- Aplicación e interpretación de pruebas de diagnóstico clínico
+- Selección escolar
+- Manejo de enfoques y procesos terapéuticos clínicos avanzados
+- Análisis e interpretación de datos de investigación en psicología
+
+Ciclo VII:
+- Selección de recursos humanos en organizaciones
+- Diagnóstico de problemas psicológicos en escolares
+- Aplicación de las redes sociales y TICs en psicología
+- Métodos para la elaboración de proyectos psicosociales
+- Diseño y manejo de talleres y redes comunitarias
+
+Ciclo VIII:
+- Medición y desarrollo de la inteligencia emocional en comunidades
+- Aplicación de apoyos terapéuticos ante la violencia
+- Prácticas psicológicas en las organizaciones
+- Aplicación de técnicas específicas a escolares
+- Aplicación de técnicas de investigación cualitativa
+
+Ciclo IX:
+- Proceso de estimulación temprana
+- Práctica de intervención comunitaria
+- Manejo de la orientación profesional-vocacional en centros educativos
+- Prácticas clínicas individuales
+
+Ciclo X:
+- Procesos formativos en las organizaciones
+- Prácticas escolares
+- Estrategia de apoyo a la comunidad educativa
+- Psicología criminalista
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN TEOLOGÍA
+--------------------------------------------------------------------------------
+Ciclo I:
+- Introducción a la Biblia y a la Teología
+- Sociología General
+- Filosofía General
+- Psicología General
+- Inglés
+
+Ciclo II:
+- Pentateuco
+- Antropología Social
+- Historia del Cristianismo
+- Evangelios Sinópticos y Hechos
+- Informática
+
+Ciclo III:
+- Libros Históricos
+- Pensamiento y Método Teológico
+- Historia de la Iglesia en América Latina y El Salvador
+- Cristología
+- Métodos y Técnicas de Investigación
+
+Ciclo IV:
+- Fundamentos del Griego Bíblico
+- Eclesiología
+- Antropología Bíblica
+- Teología en América Latina y El Salvador
+- Ética Profesional
+
+Ciclo V:
+- Fundamentos del Hebreo Bíblico
+- Literatura Poética y Sapiencial
+- Administración Eclesiástica
+- Teología y Género
+- Teología Pastoral
+
+Ciclo VI:
+- Hermenéutica Bíblica
+- Psicología Pastoral
+- Cartas Paulinas
+- Formulación y Evaluación de Proyectos
+- Sociología Urbana y Rural
+
+Ciclo VII:
+- Literatura Profética
+- Cartas Universales
+- Teología Contemporánea I
+- Gerencia Social y Trabajo Social
+- Derechos Humanos
+
+Ciclo VIII:
+- Ciencias de la Religión
+- Escritos Joánicos y Apocalipsis
+- Teología Contemporánea II
+- Diaconía
+
+Ciclo IX:
+- Educación Cristiana
+- Teología Ecuménica
+- Ecoteología
+- Homilética y Liturgia
+
+Ciclo X:
+- Seminario de Investigación
+
+--------------------------------------------------------------------------------
+LICENCIATURA EN TRABAJO SOCIAL
+--------------------------------------------------------------------------------
+Ciclo I:
+- Técnicas de Redacción y Ortografía
+- Sociología General
+- Introducción al Trabajo Social
+- Psicología General
+- Filosofía General
+
+Ciclo II:
+- Estadística Social
+- Antropología Social
+- Metodología del Trabajo Social I
+- Ética Profesional
+- Informática
+
+Ciclo III:
+- Investigación Social
+- Cooperativismo
+- Metodología del Trabajo Social II
+- Derechos Humanos
+- Inglés
+
+Ciclo IV:
+- Principios Generales de Economía
+- Niñez, Adolescencia y Juventud
+- La Comunicación y el Trabajo Social
+- Psicología de la Personalidad
+- Legislación y Trabajo Social
+
+Ciclo V:
+- Historia Económica y Social de El Salvador
+- Género y Sociedad
+- Introducción a la Práctica Profesional
+- Psicología Social
+- Gerencia Social y Trabajo Social
+
+Ciclo VI:
+- Resolución Alterna de Conflictos
+- Intervención Social, Individual y Familiar
+- Sociología Urbana y Rural
+- Práctica Profesional Institucional
+- Formulación y Evaluación de Proyectos
+
+Ciclo VII:
+- Método de Educación Popular
+- Planificación Social y Estratégica
+- Práctica Profesional Individual y Familiar
+- Trabajo Social Internacional
+- Grupo y Sociedad
+
+Ciclo VIII:
+- Adultez Mayor y Sociedad
+- Práctica Profesional Grupal
+- Salud Pública y Promoción para la Salud
+- Acción Social Comunitaria
+
+Ciclo IX:
+- Gestión Estratégica de Riesgo y Medio Ambiente
+- Práctica Profesional Comunitaria
+- Promoción Humana
+- Desarrollo Territorial
+
+Ciclo X:
+- Seminarios sobre Problemas Sociales de El Salvador
+- Seminario de Investigación

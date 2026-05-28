@@ -1,0 +1,268 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProfileSidebar from '../../components/dashboard/ProfileSidebar';
+import AttendanceCards from '../../components/dashboard/AttendanceCards';
+import ScheduleToday from '../../components/dashboard/ScheduleToday';
+import AnnouncementsPanel from '../../components/dashboard/AnnouncementsPanel';
+import DashboardTramites from '../../components/dashboard/DashboardTramites';
+import SolvenciaAcademica from '../../components/dashboard/SolvenciaAcademica';
+
+import { getRoleLabel } from '../../lib/session';
+import { BRAND } from '../../lib/branding';
+import { buildDashboardData } from '../../lib/dashboard';
+import { db, Enrollment, Subject, Opportunity, Application, eq } from 'astro:db';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+
+const roleLabel = getRoleLabel(user.role);
+
+const enrollments = await db
+  .select()
+  .from(Enrollment)
+  .where(eq(Enrollment.userId, user.id))
+  .all();
+
+const allSubjects = await db.select().from(Subject).all();
+const subjectMap = Object.fromEntries(allSubjects.map((s) => [s.id, s]));
+
+const enrolledSubjects = enrollments
+  .map((e) => ({ enrollment: e, subject: subjectMap[e.subjectId] }))
+  .filter((x) => x.subject)
+  .map(({ subject: s, enrollment: e }) => ({
+    id: s.id,
+    nombre: s.nombre,
+    codigo: s.codigo,
+    horario: s.horario,
+    aula: s.aula,
+    carrera: s.carrera,
+    enrollmentEstado: e.estado ?? 'pending',
+  }));
+
+const allOpps = await db.select().from(Opportunity).all();
+const activeOpps = allOpps.filter((o) => o.activo);
+
+// Opportunities relevant to this student's career
+const carreraOpps = activeOpps.filter((o) => {
+  if (!user.carrera) return true;          // no career set → show all
+  if (!o.carreras)   return true;          // no career filter on opp → show to all
+  try {
+    const list: string[] = JSON.parse(o.carreras as string);
+    return !Array.isArray(list) || list.length === 0 || list.includes(user.carrera);
+  } catch {
+    return true;
+  }
+});
+
+const userApps = await db
+  .select()
+  .from(Application)
+  .where(eq(Application.userId, user.id))
+  .all();
+
+const activeApps = userApps.filter((a) => a.estado !== 'withdrawn');
+const oppMap = Object.fromEntries(allOpps.map((o) => [o.id, o]));
+
+const hoursAccumulated = activeApps
+  .filter((a) => a.estado === 'accepted')
+  .reduce((sum, a) => sum + (oppMap[a.opportunityId]?.horasSemanales ?? 0), 0);
+
+const dashboardData = buildDashboardData({
+  userCarrera: user.carrera ?? '',
+  enrolledSubjects,
+  applications: activeApps.map((a) => ({
+    opportunityId: a.opportunityId,
+    estado: a.estado,
+    createdAt: a.createdAt,
+  })),
+  opportunities: carreraOpps,
+  oppMap,
+});
+
+const isAdmin = user.role === 'admin' || user.role === 'superadmin';
+---
+
+<Layout
+  title={`${BRAND.panel.title} - Plataforma ULS`}
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <div class="db-page">
+
+    {/* ── Welcome bar ── */}
+    <div class="db-welcome-bar">
+      <div class="db-welcome-bar-inner">
+        <div>
+          <h1 class="db-welcome-title">
+            Buenos días, {user.nombre.split(' ')[0]}
+          </h1>
+          <p class="db-welcome-sub">
+            {user.email}{user.carrera ? ` · ${user.carrera}` : ''} · {roleLabel}
+          </p>
+        </div>
+        {!user.carrera && (
+          <a href="#mi-perfil" class="db-welcome-cta">
+            Completa tu perfil →
+          </a>
+        )}
+      </div>
+    </div>
+
+    {/* ── Main 3-col layout ── */}
+    <div class="db-layout">
+
+      {/* ── Left sidebar ── */}
+      <ProfileSidebar
+        client:load
+        nombre={user.nombre}
+        carrera={user.carrera ?? ''}
+        ciclo={user.ciclo ?? 'I'}
+        email={user.email}
+        roleLabel={roleLabel}
+        avatarUrl={user.avatarUrl ?? ''}
+        isAdmin={isAdmin}
+      />
+
+      {/* ── Central content ── */}
+      <main class="db-main">
+
+        {/* Stats row */}
+        <div class="db-stats-row">
+          <a href="/wiki" class="db-stat-card db-stat-card-1">
+            <p class="db-stat-label">Materias activas</p>
+            <p class="db-stat-value">{enrollments.filter(e => e.estado === 'approved').length}</p>
+            <span class="db-stat-link">Ver Wiki →</span>
+          </a>
+          <a href="/bridge" class="db-stat-card db-stat-card-2">
+            <p class="db-stat-label">Oportunidades para ti</p>
+            <p class="db-stat-value">{carreraOpps.length}</p>
+            <span class="db-stat-link">Ir a Bridge →</span>
+          </a>
+          <a href="/bridge" class="db-stat-card db-stat-card-3">
+            <p class="db-stat-label">Mis aplicaciones</p>
+            <p class="db-stat-value">{activeApps.length}</p>
+            <span class="db-stat-link">Gestionar →</span>
+          </a>
+          <a href="/bridge" class="db-stat-card db-stat-card-4">
+            <p class="db-stat-label">Horas acumuladas</p>
+            <p class="db-stat-value">{hoursAccumulated}</p>
+            <span class="db-stat-link">Pasantías →</span>
+          </a>
+        </div>
+
+        {/* Attendance section */}
+        <div class="db-section-card">
+          <div class="db-section-head">
+            <span class="db-section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+              Asistencia por materia
+            </span>
+            <a href="/wiki" class="db-link">+ Inscribir materias</a>
+          </div>
+          <div class="db-section-body">
+            <AttendanceCards client:load subjects={enrolledSubjects} />
+          </div>
+        </div>
+
+        {/* Today's schedule */}
+        <div class="db-section-card">
+          <div class="db-section-head">
+            <span class="db-section-title">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+              Horario de hoy
+            </span>
+            <a href="/wiki" class="db-link">Ver completo</a>
+          </div>
+          <div class="db-section-body">
+            <ScheduleToday client:load subjects={enrolledSubjects} />
+          </div>
+        </div>
+
+        {/* Admin shortcut */}
+        {isAdmin && (
+          <a href="/admin" class="db-admin-card">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <div>
+              <h3 class="font-semibold text-sm">Panel de Administración</h3>
+              <p class="text-xs text-slate-400 mt-0.5">Gestiona usuarios, materias y configuración del sistema</p>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-auto text-slate-400"><polyline points="9 18 15 12 9 6"/></svg>
+          </a>
+        )}
+
+        {/* Module shortcuts */}
+        <div class="db-modules-row">
+          <a href="/wiki" class="db-module-card">
+            <div class="db-module-icon db-module-icon-wiki">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div>
+              <p class="db-module-label">{BRAND.wiki.nav}</p>
+              <p class="db-module-sub">{BRAND.wiki.subtitle}</p>
+            </div>
+          </a>
+          <a href="/concierge" class="db-module-card">
+            <div class="db-module-icon db-module-icon-lia">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            </div>
+            <div>
+              <p class="db-module-label">{BRAND.assistant.name}</p>
+              <p class="db-module-sub">{BRAND.assistant.subtitle}</p>
+            </div>
+          </a>
+          <a href="/bridge" class="db-module-card">
+            <div class="db-module-icon db-module-icon-bridge">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4"/><path d="M2 11h20"/><path d="M4 11v8"/><path d="M20 11v8"/><path d="M2 19h20"/><path d="M10 11v8"/><path d="M14 11v8"/></svg>
+            </div>
+            <div>
+              <p class="db-module-label">{BRAND.bridge.nav}</p>
+              <p class="db-module-sub">{BRAND.bridge.subtitle}</p>
+            </div>
+          </a>
+        </div>
+
+        {/* Tramites */}
+        <div class="db-section-card db-section-card-warn" id="mi-perfil">
+          <div class="db-section-head">
+            <span class="db-section-title text-amber-900">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              Trámites
+            </span>
+            {dashboardData.pendingTramitesCount > 0 && (
+              <span class="db-badge-warn">{dashboardData.pendingTramitesCount} activo(s)</span>
+            )}
+          </div>
+          <div class="db-section-body">
+            <DashboardTramites client:load tramites={dashboardData.tramites} />
+            <div class="mt-4">
+              <SolvenciaAcademica client:load />
+            </div>
+          </div>
+        </div>
+
+        {/* Footer quick links */}
+        <footer class="db-footer">
+          <a href="#" class="db-footer-link">Ayuda</a>
+          <span class="db-footer-sep">·</span>
+          <a href="#" class="db-footer-link">Comentarios</a>
+          <span class="db-footer-sep">·</span>
+          <a href="#" class="db-footer-link">Política de privacidad</a>
+          <span class="db-footer-sep">·</span>
+          <span class="text-slate-400">Edunexus &copy; 2026</span>
+        </footer>
+
+      </main>
+
+      {/* ── Right panel ── */}
+      <AnnouncementsPanel
+        client:load
+        alerts={dashboardData.alerts}
+        events={dashboardData.events}
+      />
+
+    </div>
+  </div>
+</Layout>

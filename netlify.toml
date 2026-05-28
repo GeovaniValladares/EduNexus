@@ -1,0 +1,7 @@
+[build]
+  # --remote tells Astro DB to use Turso instead of local SQLite
+  command = "astro build --remote"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"

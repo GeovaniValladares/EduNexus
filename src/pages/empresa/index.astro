@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import CompanyPanel from '../../components/empresa/CompanyPanel';
+import { isEmpresa, getRoleLabel } from '../../lib/roles';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (!isEmpresa(user.role)) return Astro.redirect('/dashboard');
+
+const roleLabel = getRoleLabel(user.role);
+---
+
+<Layout
+  title="Panel de Empresa — Edunexus ULS"
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="bridge"
+      title="Panel de Empresa"
+      subtitle="Gestión de talento y revisión de candidatos"
+      variant="panel"
+      badge={`${user.nombre} · ${roleLabel}`}
+    />
+
+    <div class="max-w-7xl mx-auto px-4">
+      <CompanyPanel client:load />
+    </div>
+  </main>
+</Layout>
+
+<style is:global>
+  .company-panel {
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>

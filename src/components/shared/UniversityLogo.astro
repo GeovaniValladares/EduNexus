@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** Use "dark" on light backgrounds and "light" on dark backgrounds. */
+  variant?: 'light' | 'dark';
+  class?: string;
+  height?: number;
+}
+
+const { variant = 'dark', class: className = '', height = 44 } = Astro.props;
+const src =
+  variant === 'light'
+    ? '/images/logos/logo-uls-dark-bg.png'
+    : '/images/logos/logo-uls-light-bg.png';
+---
+
+<img
+  src={src}
+  alt="Universidad Luterana Salvadoreña"
+  class:list={['object-contain', className]}
+  style={`height: ${height}px; width: auto;`}
+/>

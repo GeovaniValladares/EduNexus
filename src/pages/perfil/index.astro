@@ -1,0 +1,42 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import ProfileSetup from '../../components/perfil/ProfileSetup';
+import { BRAND } from '../../lib/branding';
+import { getRoleLabel } from '../../lib/session';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (!user.perfilCompleto) return Astro.redirect('/perfil/completar');
+
+const roleLabel = getRoleLabel(user.role);
+---
+
+<Layout
+  title="Mi Perfil — Edunexus ULS"
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="panel"
+      title="Mi Perfil"
+      subtitle="Gestiona tu información personal, académica y profesional"
+      variant="panel"
+      badge={`${user.email} · ${roleLabel}`}
+    />
+
+    <ProfileSetup
+      client:load
+      initialNombre={user.nombre}
+      initialCarrera={user.carrera}
+      initialCiclo={user.ciclo}
+      initialAvatarUrl={user.avatarUrl}
+      email={user.email}
+      editMode={true}
+    />
+  </main>
+</Layout>

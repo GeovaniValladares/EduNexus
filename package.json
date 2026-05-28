@@ -6,12 +6,46 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "dev": "astro dev",
+    "dev": "node scripts/dev-persistent.mjs",
+    "dev:fresh": "node scripts/force-reset-db.mjs && node scripts/dev-persistent.mjs",
     "build": "astro build",
+    "build:prod": "astro build --remote",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "db:setup": "node scripts/setup-persistent-db.mjs",
+    "db:push": "astro db push",
+    "db:seed": "astro db execute db/seed.ts",
+    "turso:init": "node scripts/turso-init.mjs",
+    "turso:seed": "node scripts/turso-seed.mjs",
+    "db:migrate": "node scripts/migrate-local-db.mjs",
+    "db:save": "node scripts/db-save.mjs",
+    "db:clean": "node scripts/db-clean.mjs",
+    "db:repair": "node scripts/repair-local-db.mjs",
+    "db:force-reset": "node scripts/force-reset-db.mjs",
+    "ai:test": "node scripts/test-ai.mjs"
   },
   "dependencies": {
-    "astro": "^6.1.8"
+    "@astrojs/db": "^0.13.0",
+    "@astrojs/netlify": "^7.0.10",
+    "@astrojs/node": "^10.1.1",
+    "@astrojs/react": "^5.0.3",
+    "@node-rs/argon2": "^2.0.2",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.1.8",
+    "dotenv": "^17.4.2",
+    "lucia": "^3.0.0",
+    "lucia-adapter-astrodb": "^0.2.0",
+    "lucide-react": "^1.16.0",
+    "openai": "^6.39.0",
+    "pdf-lib": "^1.17.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^4.2.2",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@libsql/client": "^0.17.3"
   }
 }

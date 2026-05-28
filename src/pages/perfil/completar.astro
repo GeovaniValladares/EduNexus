@@ -1,0 +1,46 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ProfileSetup from '../../components/perfil/ProfileSetup';
+import SiteLogo from '../../components/shared/SiteLogo.astro';
+import UniversityLogo from '../../components/shared/UniversityLogo.astro';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (user.perfilCompleto) return Astro.redirect('/dashboard');
+---
+
+<Layout title="Completa tu perfil — Edunexus ULS" showNavbar={false} userName={user.nombre} userRole={user.role}>
+  <div class="setup-page">
+    <!-- Minimal header (no full navbar) -->
+    <header class="setup-header">
+      <div class="setup-header-inner">
+        <a href="/" class="flex items-center gap-3">
+          <SiteLogo height={28} />
+          <UniversityLogo height={30} class="hidden sm:block opacity-90" />
+        </a>
+        <span class="setup-header-badge">Configura tu cuenta</span>
+      </div>
+    </header>
+
+    <main class="setup-main">
+      <div class="setup-intro">
+        <h1 class="setup-intro-title">¡Bienvenido/a a Edunexus!</h1>
+        <p class="setup-intro-sub">
+          Completa tu perfil para desbloquear materias, aplicar a pasantías y generar tu CV.
+          Solo toma unos minutos.
+        </p>
+      </div>
+
+      <ProfileSetup
+        client:load
+        initialNombre={user.nombre}
+        initialCarrera={user.carrera}
+        initialCiclo={user.ciclo}
+        initialAvatarUrl={user.avatarUrl}
+        email={user.email}
+      />
+    </main>
+  </div>
+</Layout>

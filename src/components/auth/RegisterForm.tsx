@@ -1,0 +1,296 @@
+import { useEffect, useId, useState } from 'react';
+import { Mail, Lock, User, GraduationCap, Building2, Info } from 'lucide-react';
+import { CARRERAS } from '../../lib/carreras';
+
+export default function RegisterForm() {
+  const formId = useId();
+  const [role, setRole] = useState<'alumno' | 'empresa'>('alumno');
+  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
+  const [carrera, setCarrera] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [animateButton, setAnimateButton] = useState(false);
+
+  useEffect(() => {
+    setEmail('');
+    setName('');
+    setCarrera('');
+    setPassword('');
+    setConfirmPassword('');
+    setError('');
+  }, []);
+
+  const isPersonalEmail = (email: string) => {
+    const personalDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com', 'live.com', 'msn.com'];
+    const domain = email.split('@')[1]?.toLowerCase();
+    return personalDomains.includes(domain);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (role === 'empresa' && isPersonalEmail(email)) {
+      setError('Use un correo institucional de su empresa. Las cuentas creadas con correos personales serán rechazadas.');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (password.length < 8) {
+      setError('La contraseña debe tener al menos 8 caracteres');
+      return;
+    }
+
+    if (role === 'alumno' && !carrera) {
+      setError('Selecciona tu carrera para acceder a materias y pasantías');
+      return;
+    }
+
+    setLoading(true);
+    setAnimateButton(true);
+    let success = false;
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          name: name.trim(),
+          carrera: role === 'alumno' ? carrera : 'Empresa',
+          password,
+          role
+        }),
+      });
+
+      if (response.ok) {
+        success = true;
+        window.setTimeout(() => {
+          window.location.href = role === 'alumno' ? '/perfil/completar' : '/empresa';
+        }, 900);
+      } else {
+        const data = await response.json();
+        setError(data.message || 'Error al registrarse');
+      }
+    } catch {
+      setError('Error de conexión. Intenta de nuevo.');
+    } finally {
+      if (!success) {
+        setLoading(false);
+        setAnimateButton(false);
+      }
+    }
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="relative space-y-4"
+      autoComplete="off"
+      data-form-type="register"
+      id={`register-${formId}`}
+    >
+      <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
+        <input type="text" name="fake-username" autoComplete="username" tabIndex={-1} defaultValue="" />
+        <input type="password" name="fake-password" autoComplete="current-password" tabIndex={-1} defaultValue="" />
+      </div>
+
+      {error && <div className="auth-error">{error}</div>}
+
+      {/* Role Selection */}
+      <div className="flex gap-2 p-1 bg-slate-100 rounded-lg mb-4">
+        <button
+          type="button"
+          onClick={() => { setRole('alumno'); setError(''); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-md transition-all ${role === 'alumno' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          <GraduationCap size={14} /> Soy Estudiante
+        </button>
+        <button
+          type="button"
+          onClick={() => { setRole('empresa'); setError(''); }}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-md transition-all ${role === 'empresa' ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+        >
+          <Building2 size={14} /> Soy Empresa
+        </button>
+      </div>
+
+      <div>
+        <label htmlFor={`${formId}-name`} className="auth-field-label">
+          {role === 'alumno' ? 'Nombre completo' : 'Nombre de la empresa'}
+        </label>
+        <div className="auth-field-wrap">
+          {role === 'alumno' ? <User className="auth-field-icon" aria-hidden /> : <Building2 className="auth-field-icon" aria-hidden />}
+          <input
+            id={`${formId}-name`}
+            name="uls-register-name"
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            autoComplete="off"
+            className="auth-input"
+            placeholder={role === 'alumno' ? "Tu nombre completo" : "Nombre legal de la empresa"}
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor={`${formId}-email`} className="auth-field-label">
+          Correo electrónico {role === 'empresa' && '(Institucional)'}
+        </label>
+        <div className="auth-field-wrap">
+          <Mail className="auth-field-icon" aria-hidden />
+          <input
+            id={`${formId}-email`}
+            name="uls-register-email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="off"
+            className="auth-input"
+            placeholder={role === 'alumno' ? "tu@email.com" : "contacto@empresa.com"}
+          />
+        </div>
+        {role === 'empresa' && (
+          <div className="mt-2 flex items-start gap-2 text-[11px] text-amber-600 leading-tight">
+            <Info size={12} className="shrink-0 mt-0.5" />
+            <p>Use un correo institucional de su empresa. Las cuentas creadas con correos personales (ej: Gmail, Yahoo, Outlook) serán rechazadas automáticamente.</p>
+          </div>
+        )}
+      </div>
+
+      {role === 'alumno' && (
+        <div>
+          <label htmlFor={`${formId}-carrera`} className="auth-field-label">
+            Carrera
+          </label>
+          <div className="auth-field-wrap">
+            <GraduationCap className="auth-field-icon" aria-hidden />
+            <select
+              id={`${formId}-carrera`}
+              name="uls-register-carrera"
+              value={carrera}
+              onChange={(e) => setCarrera(e.target.value)}
+              required
+              autoComplete="off"
+              className="auth-select pl-11"
+            >
+              <option value="">Selecciona tu carrera</option>
+              {CARRERAS.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )}
+
+      <div>
+        <label htmlFor={`${formId}-password`} className="auth-field-label">
+          Contraseña
+        </label>
+        <div className="auth-field-wrap">
+          <Lock className="auth-field-icon" aria-hidden />
+          <input
+            id={`${formId}-password`}
+            name="uls-register-password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            className="auth-input"
+            placeholder="Mínimo 8 caracteres"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor={`${formId}-confirm`} className="auth-field-label">
+          Confirmar contraseña
+        </label>
+        <div className="auth-field-wrap">
+          <Lock className="auth-field-icon" aria-hidden />
+          <input
+            id={`${formId}-confirm`}
+            name="uls-register-password-confirm"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+            minLength={8}
+            autoComplete="new-password"
+            className="auth-input"
+            placeholder="Repite tu contraseña"
+          />
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className={`auth-login-fp-btn ${animateButton ? 'active' : ''}`}
+      >
+        <span className="auth-login-fp-text">{loading ? 'Registrando...' : 'Crear cuenta'}</span>
+        <svg className="auth-login-fp-icon auth-login-fp-icon-base" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+          <g className="auth-login-fp-out" fill="none" strokeWidth="2" strokeLinecap="round">
+            <path className="odd" d="m 25.117139,57.142857 c 0,0 -1.968558,-7.660465 -0.643619,-13.149003 1.324939,-5.488538 4.659682,-8.994751 4.659682,-8.994751" />
+            <path className="odd" d="m 31.925369,31.477584 c 0,0 2.153609,-2.934998 9.074971,-5.105078 6.921362,-2.17008 11.799844,-0.618718 11.799844,-0.618718" />
+            <path className="odd" d="m 57.131213,26.814448 c 0,0 5.127709,1.731228 9.899495,7.513009 4.771786,5.781781 4.772971,12.109204 4.772971,12.109204" />
+            <path className="odd" d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485" />
+            <path className="even" d="m 27.849282,62.75 c 0,0 1.286086,-1.279223 1.25,-4.25 -0.03609,-2.970777 -1.606117,-7.675266 -0.625,-12.75 0.981117,-5.074734 4.5,-9.5 4.5,-9.5" />
+            <path className="even" d="m 36.224282,33.625 c 0,0 8.821171,-7.174484 19.3125,-2.8125 10.491329,4.361984 11.870558,14.952665 11.870558,14.952665" />
+            <path className="even" d="m 68.349282,49.75 c 0,0 0.500124,3.82939 0.5625,5.8125 0.06238,1.98311 -0.1875,5.9375 -0.1875,5.9375" />
+            <path className="odd" d="m 31.099282,65.625 c 0,0 1.764703,-4.224042 2,-7.375 0.235297,-3.150958 -1.943873,-9.276886 0.426777,-15.441942 2.370649,-6.165056 8.073223,-7.933058 8.073223,-7.933058" />
+            <path className="odd" d="m 45.849282,33.625 c 0,0 12.805566,-1.968622 17,9.9375 4.194434,11.906122 1.125,24.0625 1.125,24.0625" />
+            <path className="even" d="m 59.099282,70.25 c 0,0 0.870577,-2.956221 1.1875,-4.5625 0.316923,-1.606279 0.5625,-5.0625 0.5625,-5.0625" />
+            <path className="even" d="m 60.901059,56.286612 c 0,0 0.903689,-9.415996 -3.801777,-14.849112 -3.03125,-3.5 -7.329245,-4.723939 -11.867187,-3.8125 -5.523438,1.109375 -7.570313,5.75 -7.570313,5.75" />
+            <path className="even" d="m 34.072577,68.846248 c 0,0 2.274231,-4.165782 2.839205,-9.033748 0.443558,-3.821814 -0.49394,-5.649939 -0.714206,-8.05386 -0.220265,-2.403922 0.21421,-4.63364 0.21421,-4.63364" />
+            <path className="odd" d="m 37.774165,70.831845 c 0,0 2.692139,-6.147592 3.223034,-11.251208 0.530895,-5.103616 -2.18372,-7.95562 -0.153491,-13.647655 2.030229,-5.692035 8.108442,-4.538898 8.108442,-4.538898" />
+            <path className="odd" d="m 54.391174,71.715729 c 0,0 2.359472,-5.427681 2.519068,-16.175068 0.159595,-10.747388 -4.375223,-12.993087 -4.375223,-12.993087" />
+            <path className="even" d="m 49.474282,73.625 c 0,0 3.730297,-8.451831 3.577665,-16.493718 -0.152632,-8.041887 -0.364805,-11.869326 -4.765165,-11.756282 -4.400364,0.113044 -3.875,4.875 -3.875,4.875" />
+            <path className="even" d="m 41.132922,72.334447 c 0,0 2.49775,-5.267079 3.181981,-8.883029 0.68423,-3.61595 0.353553,-9.413359 0.353553,-9.413359" />
+            <path className="odd" d="m 45.161782,73.75 c 0,0 1.534894,-3.679847 2.40625,-6.53125 0.871356,-2.851403 1.28125,-7.15625 1.28125,-7.15625" />
+            <path className="odd" d="m 48.801947,56.125 c 0,0 0.234502,-1.809418 0.109835,-3.375 -0.124667,-1.565582 -0.5625,-3.1875 -0.5625,-3.1875" />
+          </g>
+        </svg>
+        <svg className="auth-login-fp-icon auth-login-fp-icon-active" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+          <g className="auth-login-fp-out" fill="none" strokeWidth="2" strokeLinecap="round">
+            <path className="odd" d="m 25.117139,57.142857 c 0,0 -1.968558,-7.660465 -0.643619,-13.149003 1.324939,-5.488538 4.659682,-8.994751 4.659682,-8.994751" />
+            <path className="odd" d="m 31.925369,31.477584 c 0,0 2.153609,-2.934998 9.074971,-5.105078 6.921362,-2.17008 11.799844,-0.618718 11.799844,-0.618718" />
+            <path className="odd" d="m 57.131213,26.814448 c 0,0 5.127709,1.731228 9.899495,7.513009 4.771786,5.781781 4.772971,12.109204 4.772971,12.109204" />
+            <path className="odd" d="m 72.334009,50.76769 0.09597,2.298098 -0.09597,2.386485" />
+            <path className="even" d="m 27.849282,62.75 c 0,0 1.286086,-1.279223 1.25,-4.25 -0.03609,-2.970777 -1.606117,-7.675266 -0.625,-12.75 0.981117,-5.074734 4.5,-9.5 4.5,-9.5" />
+            <path className="even" d="m 36.224282,33.625 c 0,0 8.821171,-7.174484 19.3125,-2.8125 10.491329,4.361984 11.870558,14.952665 11.870558,14.952665" />
+            <path className="even" d="m 68.349282,49.75 c 0,0 0.500124,3.82939 0.5625,5.8125 0.06238,1.98311 -0.1875,5.9375 -0.1875,5.9375" />
+            <path className="odd" d="m 31.099282,65.625 c 0,0 1.764703,-4.224042 2,-7.375 0.235297,-3.150958 -1.943873,-9.276886 0.426777,-15.441942 2.370649,-6.165056 8.073223,-7.933058 8.073223,-7.933058" />
+            <path className="odd" d="m 45.849282,33.625 c 0,0 12.805566,-1.968622 17,9.9375 4.194434,11.906122 1.125,24.0625 1.125,24.0625" />
+            <path className="even" d="m 59.099282,70.25 c 0,0 0.870577,-2.956221 1.1875,-4.5625 0.316923,-1.606279 0.5625,-5.0625 0.5625,-5.0625" />
+            <path className="even" d="m 60.901059,56.286612 c 0,0 0.903689,-9.415996 -3.801777,-14.849112 -3.03125,-3.5 -7.329245,-4.723939 -11.867187,-3.8125 -5.523438,1.109375 -7.570313,5.75 -7.570313,5.75" />
+            <path className="even" d="m 34.072577,68.846248 c 0,0 2.274231,-4.165782 2.839205,-9.033748 0.443558,-3.821814 -0.49394,-5.649939 -0.714206,-8.05386 -0.220265,-2.403922 0.21421,-4.63364 0.21421,-4.63364" />
+            <path className="odd" d="m 37.774165,70.831845 c 0,0 2.692139,-6.147592 3.223034,-11.251208 0.530895,-5.103616 -2.18372,-7.95562 -0.153491,-13.647655 2.030229,-5.692035 8.108442,-4.538898 8.108442,-4.538898" />
+            <path className="odd" d="m 54.391174,71.715729 c 0,0 2.359472,-5.427681 2.519068,-16.175068 0.159595,-10.747388 -4.375223,-12.993087 -4.375223,-12.993087" />
+            <path className="even" d="m 49.474282,73.625 c 0,0 3.730297,-8.451831 3.577665,-16.493718 -0.152632,-8.041887 -0.364805,-11.869326 -4.765165,-11.756282 -4.400364,0.113044 -3.875,4.875 -3.875,4.875" />
+            <path className="even" d="m 41.132922,72.334447 c 0,0 2.49775,-5.267079 3.181981,-8.883029 0.68423,-3.61595 0.353553,-9.413359 0.353553,-9.413359" />
+            <path className="odd" d="m 45.161782,73.75 c 0,0 1.534894,-3.679847 2.40625,-6.53125 0.871356,-2.851403 1.28125,-7.15625 1.28125,-7.15625" />
+            <path className="odd" d="m 48.801947,56.125 c 0,0 0.234502,-1.809418 0.109835,-3.375 -0.124667,-1.565582 -0.5625,-3.1875 -0.5625,-3.1875" />
+          </g>
+        </svg>
+        <svg className="auth-login-fp-ok" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" aria-hidden="true">
+          <path d="M34.912 50.75l10.89 10.125L67 36.75" fill="none" stroke="#fff" strokeWidth="6" />
+        </svg>
+      </button>
+    </form>
+  );
+}

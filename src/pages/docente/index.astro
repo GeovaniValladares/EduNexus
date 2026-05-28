@@ -1,0 +1,37 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import TeacherPanel from '../../components/docente/TeacherPanel';
+import { getRoleLabel } from '../../lib/session';
+import { isDocente } from '../../lib/roles';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (!isDocente(user.role)) return Astro.redirect('/dashboard');
+
+const roleLabel = getRoleLabel(user.role);
+---
+
+<Layout
+  title="Panel Docente — Edunexus ULS"
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="panel"
+      title="Panel Docente"
+      subtitle="Gestiona tus materias, alumnos, asistencia y horarios"
+      variant="panel"
+      badge={`${user.nombre} · ${roleLabel}`}
+    />
+
+    <TeacherPanel
+      client:load
+      teacherNombre={user.nombre}
+    />
+  </main>
+</Layout>

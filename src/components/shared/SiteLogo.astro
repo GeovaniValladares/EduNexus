@@ -1,0 +1,21 @@
+---
+interface Props {
+  /** Use "dark" on light backgrounds and "light" on dark backgrounds. */
+  variant?: 'light' | 'dark';
+  class?: string;
+  height?: number;
+}
+
+const { variant = 'dark', class: className = '', height = 40 } = Astro.props;
+const src =
+  variant === 'light'
+    ? '/images/logos/logo-edunexus-dark-bg.png'
+    : '/images/logos/logo-edunexus-light-bg.png';
+---
+
+<img
+  src={src}
+  alt="Edunexus"
+  class:list={['object-contain', className]}
+  style={`height: ${height}px; width: auto;`}
+/>

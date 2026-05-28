@@ -1,0 +1,131 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import WikiCatalog from '../../components/wiki/WikiCatalog';
+import { BRAND } from '../../lib/branding';
+import { isAdmin } from '../../lib/roles';
+import { formatFecha } from '../../lib/bridge';
+import { db, Subject, Enrollment, User, eq } from 'astro:db';
+import { ROLES } from '../../lib/roles';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+
+const userIsAdmin = isAdmin(user.role);
+
+const allSubjects = await db.select().from(Subject).all();
+const enrollments = await db
+  .select()
+  .from(Enrollment)
+  .where(eq(Enrollment.userId, user.id))
+  .all();
+
+const enrollmentCounts = await db.select().from(Enrollment).all();
+const countBySubject = enrollmentCounts.reduce<Record<string, number>>((acc, e) => {
+  acc[e.subjectId] = (acc[e.subjectId] ?? 0) + 1;
+  return acc;
+}, {});
+
+const subjects = allSubjects.map((s) => ({
+  id: s.id,
+  codigo: s.codigo,
+  nombre: s.nombre,
+  carrera: s.carrera,
+  semestre: s.semestre,
+  creditos: s.creditos,
+  profesor: s.profesor,
+  horario: s.horario,
+  aula: s.aula,
+  cupo: s.cupo,
+  inscritos: countBySubject[s.id] ?? 0,
+}));
+
+// Map subjectId → enrollment estado for the current user
+const enrollmentEstados: Record<string, string> = Object.fromEntries(
+  enrollments.map((e) => [e.subjectId, e.estado ?? 'pending'])
+);
+const enrolledIds = enrollments.map((e) => e.subjectId);
+
+let enrollmentsBySubject: Record<
+  string,
+  {
+    enrollmentId: string;
+    userId: string;
+    nombre: string;
+    email: string;
+    carrera: string;
+    fecha: string;
+  }[]
+> = {};
+
+let initialStudents: {
+  id: string;
+  nombre: string;
+  email: string;
+  carrera: string;
+  inscripciones: number;
+}[] = [];
+
+if (userIsAdmin) {
+  const allUsers = await db.select().from(User).all();
+  const userMap = Object.fromEntries(allUsers.map((u) => [u.id, u]));
+
+  const countByUser = enrollmentCounts.reduce<Record<string, number>>((acc, e) => {
+    acc[e.userId] = (acc[e.userId] ?? 0) + 1;
+    return acc;
+  }, {});
+
+  initialStudents = allUsers
+    .filter((u) => u.role === ROLES.ALUMNO || u.role === ROLES.STUDENT)
+    .map((u) => ({
+      id: u.id,
+      nombre: u.nombre,
+      email: u.email,
+      carrera: u.carrera ?? '',
+      inscripciones: countByUser[u.id] ?? 0,
+    }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+  enrollmentsBySubject = enrollmentCounts.reduce<typeof enrollmentsBySubject>((acc, e) => {
+    const u = userMap[e.userId];
+    if (!u) return acc;
+    if (!acc[e.subjectId]) acc[e.subjectId] = [];
+    acc[e.subjectId].push({
+      enrollmentId: e.id,
+      userId: u.id,
+      nombre: u.nombre,
+      email: u.email,
+      carrera: u.carrera ?? '—',
+      fecha: formatFecha(e.createdAt),
+    });
+    return acc;
+  }, {});
+}
+---
+
+<Layout title={`${BRAND.wiki.title} - Plataforma ULS`} showNavbar={true} userName={user.nombre} userRole={user.role}>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="wiki"
+      title={BRAND.wiki.title}
+      subtitle={BRAND.wiki.subtitle}
+      variant="wiki"
+      badge={userIsAdmin ? 'Vista administrador — catálogo completo' : user.carrera ? `Tu carrera: ${user.carrera}` : undefined}
+      badgeAdmin={userIsAdmin}
+    />
+
+    <WikiCatalog
+      client:load
+      userCarrera={user.carrera ?? ''}
+      userCiclo={user.ciclo ?? 'I'}
+      userRole={user.role}
+      subjects={subjects}
+      initialEnrolledIds={enrolledIds}
+      enrollmentEstados={enrollmentEstados}
+      enrollmentsBySubject={enrollmentsBySubject}
+      initialStudents={initialStudents}
+    />
+  </main>
+</Layout>

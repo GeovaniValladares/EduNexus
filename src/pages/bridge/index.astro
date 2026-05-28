@@ -1,0 +1,320 @@
+---
+
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import BridgePanel from '../../components/bridge/BridgePanel';
+
+import { db, Opportunity, Application, User, eq } from 'astro:db';
+
+import { parseRequisitos, parseCarreras, formatFecha } from '../../lib/bridge';
+
+import { BRAND } from '../../lib/branding';
+
+import { isAdmin } from '../../lib/roles';
+
+import { ROLES } from '../../lib/roles';
+
+
+
+export const prerender = false;
+
+
+
+const user = Astro.locals.user;
+
+if (!user) return Astro.redirect('/auth/login');
+
+
+
+const userIsAdmin = isAdmin(user.role);
+
+
+
+const allOpportunities = await db.select().from(Opportunity).all();
+
+const visibleOpportunities = userIsAdmin
+
+  ? allOpportunities
+
+  : allOpportunities.filter((o) => o.activo);
+
+
+
+const allApplications = await db.select().from(Application).all();
+
+const userApplications = allApplications.filter((a) => a.userId === user.id);
+
+
+
+const activeApps = userApplications.filter((a) => a.estado !== 'withdrawn');
+
+const appliedOppIds = new Set(activeApps.map((a) => a.opportunityId));
+
+const appByOppId = Object.fromEntries(activeApps.map((a) => [a.opportunityId, a]));
+
+
+
+const countByOpp = allApplications.reduce<Record<string, number>>((acc, a) => {
+
+  if (a.estado !== 'withdrawn') {
+
+    acc[a.opportunityId] = (acc[a.opportunityId] ?? 0) + 1;
+
+  }
+
+  return acc;
+
+}, {});
+
+
+
+const opportunities = visibleOpportunities.map((o) => ({
+
+  id: o.id,
+
+  titulo: o.titulo,
+
+  empresa: o.empresa,
+
+  tipo: o.tipo,
+
+  horasSemanales: o.horasSemanales,
+
+  duracionSemanas: o.duracionSemanas,
+
+  duracionLabel: o.duracionLabel,
+
+  ubicacion: o.ubicacion,
+
+  descripcion: o.descripcion,
+
+  requisitos: parseRequisitos(o.requisitos),
+
+  carreras: parseCarreras(o.carreras),
+
+  activo: o.activo,
+
+  postulaciones: countByOpp[o.id] ?? 0,
+
+  aplicado: appliedOppIds.has(o.id),
+
+  applicationId: appByOppId[o.id]?.id,
+
+}));
+
+
+
+const oppMap = Object.fromEntries(allOpportunities.map((o) => [o.id, o]));
+
+
+
+const applications = activeApps.map((a) => {
+
+  const opp = oppMap[a.opportunityId];
+
+  return {
+
+    id: a.id,
+
+    opportunityId: a.opportunityId,
+
+    titulo: opp?.titulo ?? 'Oportunidad',
+
+    empresa: opp?.empresa ?? '—',
+
+    estado: a.estado as 'pending' | 'accepted' | 'rejected' | 'withdrawn',
+
+    mensaje: a.mensaje ?? '',
+
+    fecha: formatFecha(a.createdAt),
+
+    horasSemanales: opp?.horasSemanales ?? 0,
+
+  };
+
+});
+
+
+
+type AdminAppRow = {
+  id: string;
+  opportunityId: string;
+  userId: string;
+  titulo: string;
+  empresa: string;
+  estudianteNombre: string;
+  estudianteEmail: string;
+  estudianteCarrera: string;
+  estado: 'pending' | 'accepted' | 'rejected' | 'withdrawn';
+  mensaje: string;
+  fecha: string;
+  horasSemanales: number;
+};
+
+let initialAdminApplications: AdminAppRow[] = [];
+let applicationsByOpp: Record<string, AdminAppRow[]> = {};
+
+
+
+let initialStudents: { id: string; nombre: string; email: string; carrera: string }[] = [];
+
+
+
+if (userIsAdmin) {
+
+  const allUsers = await db.select().from(User).all();
+
+  const userMap = Object.fromEntries(allUsers.map((u) => [u.id, u]));
+
+
+
+  initialStudents = allUsers
+
+    .filter((u) => u.role === ROLES.ALUMNO || u.role === ROLES.STUDENT)
+
+    .map((u) => ({
+
+      id: u.id,
+
+      nombre: u.nombre,
+
+      email: u.email,
+
+      carrera: u.carrera ?? '',
+
+    }))
+
+    .sort((a, b) => a.nombre.localeCompare(b.nombre));
+
+
+
+  initialAdminApplications = allApplications
+
+    .filter((a) => a.estado !== 'withdrawn')
+
+    .map((a) => {
+
+      const opp = oppMap[a.opportunityId];
+
+      const u = userMap[a.userId];
+
+      return {
+
+        id: a.id,
+
+        opportunityId: a.opportunityId,
+
+        userId: a.userId,
+
+        titulo: opp?.titulo ?? '—',
+
+        empresa: opp?.empresa ?? '—',
+
+        estudianteNombre: u?.nombre ?? '—',
+
+        estudianteEmail: u?.email ?? '—',
+
+        estudianteCarrera: u?.carrera ?? '—',
+
+        estado: a.estado as AdminAppRow['estado'],
+
+        mensaje: a.mensaje ?? '',
+
+        fecha: formatFecha(a.createdAt),
+
+        horasSemanales: opp?.horasSemanales ?? 0,
+
+      };
+
+    })
+
+    .sort((a, b) => b.fecha.localeCompare(a.fecha));
+
+
+
+  applicationsByOpp = initialAdminApplications.reduce<Record<string, AdminAppRow[]>>((acc, app) => {
+
+    if (!acc[app.opportunityId]) acc[app.opportunityId] = [];
+
+    acc[app.opportunityId].push(app);
+
+    return acc;
+
+  }, {});
+
+}
+
+
+
+const hoursAccumulated = activeApps
+
+  .filter((a) => a.estado === 'accepted')
+
+  .reduce((sum, a) => sum + (oppMap[a.opportunityId]?.horasSemanales ?? 0), 0);
+
+
+
+const dbUser = await db.select().from(User).where(eq(User.id, user.id)).get();
+
+const hasCv = (dbUser?.cvText?.trim().length ?? 0) > 80;
+
+
+
+const stats = {
+
+  totalOpportunities: userIsAdmin
+
+    ? opportunities.filter((o) => o.activo).length
+
+    : opportunities.length,
+
+  myApplications: activeApps.length,
+
+  hoursAccumulated,
+
+};
+
+---
+
+
+
+<Layout title={`${BRAND.bridge.title} - Plataforma ULS`} showNavbar={true} userName={user.nombre} userRole={user.role}>
+
+  <main class="uls-main">
+    <AppPageHeader
+      icon="bridge"
+      title={BRAND.bridge.title}
+      subtitle={BRAND.bridge.subtitle}
+      variant="bridge"
+      badge={userIsAdmin ? 'Vista administrador — gestión de oportunidades' : user.carrera ? `Tu carrera: ${user.carrera}` : undefined}
+      badgeAdmin={userIsAdmin}
+    />
+
+    <BridgePanel
+
+      client:load
+
+      userCarrera={user.carrera ?? ''}
+
+      userRole={user.role}
+
+      hasCv={hasCv}
+
+      opportunities={opportunities}
+
+      applications={applications}
+
+      initialAdminApplications={initialAdminApplications}
+
+      applicationsByOpp={applicationsByOpp}
+
+      initialStudents={initialStudents}
+
+      stats={stats}
+
+    />
+
+  </main>
+
+</Layout>
+

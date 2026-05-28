@@ -1,23 +1,48 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/shared/Navbar.astro';
+import AppBackground from '../components/shared/AppBackground.astro';
+import { getRoleLabel } from '../lib/session';
+
+interface Props {
+	title: string;
+	description?: string;
+	showNavbar?: boolean;
+	userName?: string;
+	userRole?: string;
+}
+
+const {
+	title,
+	description = 'Plataforma Integral de Gestión Académica ULS',
+	showNavbar = true,
+	userName,
+	userRole = 'alumno',
+} = Astro.props;
+
+const roleLabel = getRoleLabel(userRole);
+const pathname = Astro.url.pathname;
+const isAppShell = showNavbar && Boolean(userName);
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="es">
 	<head>
 		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<link rel="icon" type="image/png" href="/images/logos/favicon.png" />
+		<link rel="shortcut icon" type="image/png" href="/images/logos/favicon.png" />
+		<link rel="apple-touch-icon" href="/images/logos/favicon.png" />
+		<title>{title}</title>
 	</head>
-	<body>
-		<slot />
+	<body class:list={[!isAppShell && !pathname.startsWith('/auth') && 'bg-slate-50', isAppShell && 'uls-app', 'min-h-screen']}>
+		{isAppShell && <AppBackground />}
+		<div class:list={[isAppShell && 'uls-app-content']}>
+			{showNavbar && userName && (
+				<Navbar userName={userName} userRole={userRole} roleLabel={roleLabel} currentPath={pathname} />
+			)}
+			<slot />
+		</div>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>

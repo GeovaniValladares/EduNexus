@@ -1,0 +1,114 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import ConciergeChat from '../../components/concierge/ConciergeChat';
+import PersonalizedPlan from '../../components/concierge/PersonalizedPlan';
+import CvForm from '../../components/concierge/CvForm';
+import { BRAND } from '../../lib/branding';
+import { buildConciergeContext } from '../../lib/concierge-context';
+import { defaultCvForm, mergeCvForm, parseCvDataJson } from '../../lib/cv-form';
+import { getAiStatus } from '../../lib/ai-config';
+import { db, User, eq } from 'astro:db';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+
+const ctx = await buildConciergeContext(user.id);
+if (!ctx) return Astro.redirect('/auth/login');
+
+const dbUser = await db.select().from(User).where(eq(User.id, user.id)).get();
+const baseForm = defaultCvForm(ctx);
+const savedForm = parseCvDataJson(dbUser?.cvData);
+const initialForm = mergeCvForm(baseForm, savedForm);
+
+const ai = getAiStatus();
+
+const chatContext = {
+  nombre: ctx.nombre,
+  carrera: ctx.carrera,
+  cum: ctx.cum,
+  materias: ctx.materias,
+  cvGuardado: ctx.cvGuardado,
+};
+---
+
+<Layout title={`${BRAND.assistant.title} - Plataforma ULS`} showNavbar={true} userName={user.nombre} userRole={user.role}>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="lia"
+      title={BRAND.assistant.name}
+      subtitle={BRAND.assistant.subtitle}
+      variant="lia"
+      badge={`${ctx.carrera || 'Sin carrera'} · CUM ${ctx.cum} (${ctx.cumLabel})${ctx.materias.length > 0 ? ` · ${ctx.materias.length} materia(s)` : ''}`}
+    />
+    {ai.configured ? (
+      <p class="text-sm text-slate-600 font-medium mb-6 -mt-3 px-1">{ai.label} — chat y CV con IA activos</p>
+    ) : (
+      <p class="text-sm text-amber-900 font-medium mb-6 -mt-3 px-1 uls-surface-warning py-2.5 px-4">
+        Añade GROQ_API_KEY en .env.local para activar la IA (ver .env.example)
+      </p>
+    )}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2 space-y-6">
+        <div class="uls-card overflow-hidden flex flex-col" style="min-height: 520px;">
+          <div class="p-4 text-white bg-[#1e3a5f] border-b border-slate-700">
+            <h2 class="text-white font-bold text-lg">{BRAND.assistant.name}</h2>
+            <p class="text-slate-300 text-sm">Chat con IA según tu carrera y materias</p>
+          </div>
+          <ConciergeChat client:load context={chatContext} aiConfigured={ai.configured} aiLabel={ai.label} />
+        </div>
+
+        <CvForm
+          client:load
+          initialForm={initialForm}
+          aiConfigured={ai.configured}
+          aiLabel={ai.label}
+          materias={ctx.materias}
+        />
+      </div>
+
+      <div class="lg:col-span-1 space-y-6">
+        <div class="uls-card p-6">
+          <h3 class="uls-section-title mb-4">Tu plan personalizado</h3>
+          <PersonalizedPlan client:load items={ctx.plan} />
+        </div>
+
+        <div class="uls-surface-muted p-6">
+          <h3 class="uls-section-title mb-3">Consejos para ti</h3>
+          <ul class="space-y-3 text-sm text-slate-600">
+            {ctx.tips.map((tip) => (
+              <li class="flex items-start gap-2">
+                <span class="text-slate-400 shrink-0">—</span>
+                <span>{tip}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {ctx.alerts.length > 0 && (
+          <div class="uls-surface-warning p-6">
+            <h3 class="uls-section-title text-amber-900 mb-3">Alertas</h3>
+            <ul class="space-y-2 text-sm text-amber-900">
+              {ctx.alerts.map((a) => (
+                <li>{a}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="uls-surface-accent p-4 text-sm text-slate-700">
+          <p class="font-semibold text-slate-900 mb-1">Bridge — Pasantías</p>
+          <p class="mb-2">
+            {ctx.oportunidades.length} oportunidad(es) para {ctx.carrera || 'tu perfil'}.
+          </p>
+          <a href="/bridge" class="uls-link font-semibold">
+            Ver oportunidades →
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>

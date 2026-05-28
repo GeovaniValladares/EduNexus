@@ -1,0 +1,30 @@
+---
+import UlsIcon from './UlsIcon.astro';
+
+interface Props {
+  icon: 'wiki' | 'lia' | 'bridge' | 'panel' | 'admin';
+  title: string;
+  subtitle: string;
+  variant?: 'wiki' | 'lia' | 'bridge' | 'panel';
+  badge?: string;
+  badgeAdmin?: boolean;
+}
+
+const { icon, title, subtitle, variant = 'panel', badge, badgeAdmin = false } = Astro.props;
+---
+
+<header class={`uls-page-header uls-page-header-${variant}`}>
+  <div class="uls-page-header-inner">
+    <div class="uls-module-icon-wrap">
+      <UlsIcon name={icon} class="w-6 h-6" />
+    </div>
+    <div class="flex-1 min-w-0">
+      <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-1">Edunexus · ULS</p>
+      <h1 class="uls-display text-2xl md:text-3xl font-bold text-slate-900">{title}</h1>
+      <p class="text-slate-600 mt-1 text-sm md:text-base">{subtitle}</p>
+      {badge && (
+        <p class:list={['uls-badge mt-3', badgeAdmin && 'uls-badge-admin']}>{badge}</p>
+      )}
+    </div>
+  </div>
+</header>

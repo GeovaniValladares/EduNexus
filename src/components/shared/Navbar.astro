@@ -1,0 +1,68 @@
+---
+import NavbarMenu from './NavbarMenu';
+import NavLinks from './NavLinks';
+import SiteLogo from './SiteLogo.astro';
+import UniversityLogo from './UniversityLogo.astro';
+import { NAV_ITEMS, canAccessNavItem } from '../../lib/roles';
+import { db, Opportunity, eq, desc } from 'astro:db';
+
+interface Props {
+  userName: string;
+  userRole: string;
+  roleLabel: string;
+  currentPath: string;
+}
+
+const { userName, userRole, roleLabel, currentPath } = Astro.props;
+
+const visibleItems = NAV_ITEMS.filter((item) =>
+  canAccessNavItem(userRole, item.roles)
+).map(({ label, href }) => ({ label, href }));
+
+// Job-offer notifications only make sense for students, not teachers
+const isTeacher = userRole === 'docente';
+
+const recentOpps = isTeacher
+  ? []
+  : await db
+      .select({ id: Opportunity.id, titulo: Opportunity.titulo, empresa: Opportunity.empresa })
+      .from(Opportunity)
+      .where(eq(Opportunity.activo, true))
+      .orderBy(desc(Opportunity.createdAt))
+      .limit(5)
+      .all();
+
+const notifications = recentOpps.map((opp) => ({
+  id: opp.id,
+  text: `Nueva oportunidad: ${opp.titulo} en ${opp.empresa}`,
+  href: '/bridge',
+  unread: true,
+}));
+---
+
+<nav class="uls-nav">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex justify-between items-center h-[4.25rem] relative">
+      <a href={userRole === 'docente' ? '/docente' : '/dashboard'} class="flex items-center gap-3 group">
+        <SiteLogo height={30} />
+        <UniversityLogo height={32} class="hidden md:block opacity-90" />
+      </a>
+
+      <div class="flex items-center gap-0.5">
+        <NavLinks client:load items={visibleItems} currentPath={currentPath} />
+      </div>
+
+      <div class="flex items-center gap-2">
+        <NavbarMenu
+          client:load
+          items={visibleItems}
+          currentPath={currentPath}
+          userName={userName}
+          userRole={roleLabel}
+          userRoleCode={userRole}
+          notifications={notifications}
+        />
+      </div>
+    </div>
+  </div>
+</nav>

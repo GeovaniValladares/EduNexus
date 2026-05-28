@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import AdminUserManager from '../../components/admin/AdminUserManager';
+import { isAdmin } from '../../lib/roles';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (!isAdmin(user.role)) return Astro.redirect('/dashboard');
+---
+
+<Layout
+  title="Gestión de usuarios — Admin · ULS"
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="admin"
+      title="Gestión de usuarios"
+      subtitle="Crea y administra estudiantes, docentes, empresas y administradores"
+      variant="panel"
+      badge="Super Admin"
+      badgeAdmin
+    />
+
+    <div class="mb-6">
+      <a href="/admin" class="text-sm text-indigo-600 hover:underline">← Volver al panel Admin</a>
+    </div>
+
+    <AdminUserManager client:load />
+  </main>
+</Layout>

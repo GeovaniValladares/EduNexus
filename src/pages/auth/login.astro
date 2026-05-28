@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AuthShell from '../../components/auth/AuthShell.astro';
+import LoginForm from '../../components/auth/LoginForm';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (user) return Astro.redirect('/dashboard');
+---
+
+<Layout title="Iniciar sesión - Plataforma ULS" showNavbar={false}>
+  <AuthShell title="Iniciar sesión" subtitle="Bienvenid@ a la Plataforma ULS" mode="login">
+    <LoginForm client:load />
+  </AuthShell>
+</Layout>

@@ -1,0 +1,3 @@
+# Bases locales (no subir a git):
+#   uls-platform.db          — datos activos
+#   uls-platform.snapshot.db — respaldo al cerrar npm run dev con Ctrl+C

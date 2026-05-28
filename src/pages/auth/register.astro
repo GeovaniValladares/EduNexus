@@ -1,0 +1,16 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AuthShell from '../../components/auth/AuthShell.astro';
+import RegisterForm from '../../components/auth/RegisterForm';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (user) return Astro.redirect('/dashboard');
+---
+
+<Layout title="Crear cuenta - Plataforma ULS" showNavbar={false}>
+  <AuthShell title="Crear cuenta" subtitle="Únete a la Plataforma ULS" mode="register">
+    <RegisterForm client:load />
+  </AuthShell>
+</Layout>

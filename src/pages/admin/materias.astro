@@ -1,0 +1,36 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import SubjectAssignment from '../../components/admin/SubjectAssignment';
+import { isAdmin } from '../../lib/roles';
+
+export const prerender = false;
+
+const user = Astro.locals.user;
+if (!user) return Astro.redirect('/auth/login');
+if (!isAdmin(user.role)) return Astro.redirect('/dashboard');
+---
+
+<Layout
+  title="Asignación de materias — Admin · ULS"
+  showNavbar={true}
+  userName={user.nombre}
+  userRole={user.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="admin"
+      title="Asignación de materias"
+      subtitle="Asigna qué docente imparte cada materia del plan académico"
+      variant="panel"
+      badge="Super Admin"
+      badgeAdmin
+    />
+
+    <div class="mb-6">
+      <a href="/admin" class="text-sm text-indigo-600 hover:underline">← Volver al panel Admin</a>
+    </div>
+
+    <SubjectAssignment client:load />
+  </main>
+</Layout>

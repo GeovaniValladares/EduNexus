@@ -1,0 +1,77 @@
+---
+import SiteLogo from '../shared/SiteLogo.astro';
+import UniversityLogo from '../shared/UniversityLogo.astro';
+import { ASSETS, BRAND } from '../../lib/branding';
+
+interface Props {
+  title: string;
+  subtitle: string;
+  mode?: 'login' | 'register';
+}
+
+const { title, subtitle, mode = 'login' } = Astro.props;
+const switchHref = mode === 'login' ? '/auth/register' : '/auth/login';
+const switchText =
+  mode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?';
+const switchLink = mode === 'login' ? 'Regístrate' : 'Inicia sesión';
+---
+
+<div class="auth-page min-h-screen flex flex-col lg:flex-row">
+  <aside
+    class="auth-hero relative lg:w-[52%] min-h-[280px] lg:min-h-screen flex flex-col justify-between p-8 md:p-12 overflow-hidden"
+  >
+    <img
+      src={ASSETS.studentImage}
+      alt="Estudiantes de la Universidad Luterana Salvadoreña"
+      class="absolute inset-0 h-full w-full object-cover object-center"
+      loading="eager"
+    />
+    <div class="auth-hero-overlay absolute inset-0" aria-hidden="true"></div>
+    <div class="auth-grid absolute inset-0 opacity-40" aria-hidden="true"></div>
+
+    <a href="/" class="auth-back relative z-10 inline-flex items-center gap-2 text-sm transition">
+      <span aria-hidden="true">←</span> Volver al inicio
+    </a>
+
+    <div class="relative z-10 mt-auto max-w-lg">
+      <div class="flex items-center gap-3 mb-6">
+        <SiteLogo variant="light" height={36} />
+        <UniversityLogo variant="light" height={40} />
+      </div>
+      <h2 class="uls-display text-3xl md:text-4xl font-bold text-white leading-tight mb-4">
+        {BRAND.siteName}<br />
+        <span class="auth-gradient-text">{BRAND.university}</span>
+      </h2>
+      <p class="text-slate-300 text-sm md:text-base leading-relaxed mb-8">
+        Wiki, Lía, Bridge y tu Panel en una sola experiencia digital diseñada para estudiantes.
+      </p>
+      <ul class="flex flex-wrap gap-2 text-xs font-medium">
+        <li class="auth-pill">Wiki académico</li>
+        <li class="auth-pill">IA con Lía</li>
+        <li class="auth-pill">Pasantías Bridge</li>
+        <li class="auth-pill">Panel estudiantil</li>
+      </ul>
+    </div>
+  </aside>
+
+  <main class="auth-form-side flex-1 flex items-center justify-center p-6 md:p-10 lg:p-14">
+    <div class="w-full max-w-md">
+      <div class="auth-card rounded-xl p-8 md:p-10">
+        <div class="mb-8">
+          <SiteLogo height={28} class="mb-4" />
+          <p class="text-xs font-semibold uppercase tracking-widest text-slate-500 mb-2">Acceso seguro</p>
+          <h1 class="uls-display text-2xl md:text-3xl font-bold text-slate-900">{title}</h1>
+          <p class="text-slate-500 mt-2">{subtitle}</p>
+        </div>
+
+        <slot />
+
+        <p class="mt-8 text-center text-sm text-slate-500">
+          {switchText}
+          <a href={switchHref} class="auth-link font-semibold ml-1">{switchLink}</a>
+        </p>
+      </div>
+      <p class="text-center text-xs text-slate-400 mt-6">© 2026 {BRAND.siteName}</p>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,272 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AppPageHeader from '../../components/shared/AppPageHeader.astro';
+import { db, User, Enrollment, Application, Subject, Opportunity, Notice, Evaluation } from 'astro:db';
+import { isAdmin, getRoleLabel, NAV_ITEMS, canAccessNavItem } from '../../lib/roles';
+
+export const prerender = false;
+
+const currentUser = Astro.locals.user;
+if (!currentUser) return Astro.redirect('/auth/login');
+if (!isAdmin(currentUser.role)) return Astro.redirect('/dashboard');
+
+const roleLabel = getRoleLabel(currentUser.role);
+const accessibleSections = NAV_ITEMS.filter((item) =>
+  canAccessNavItem(currentUser.role, item.roles)
+);
+
+// ── Real stats ────────────────────────────────────────────────────────────────
+const [allUsers, allEnrollments, allApplications, allSubjects, allOpps, allNotices, allEvals] =
+  await Promise.all([
+    db.select().from(User).all(),
+    db.select().from(Enrollment).all(),
+    db.select().from(Application).all(),
+    db.select().from(Subject).all(),
+    db.select().from(Opportunity).all(),
+    db.select().from(Notice).all(),
+    db.select().from(Evaluation).all(),
+  ]);
+
+const students    = allUsers.filter((u) => u.role === 'alumno' || u.role === 'student');
+const docentes    = allUsers.filter((u) => u.role === 'docente');
+const admins      = allUsers.filter((u) => u.role === 'admin' || u.role === 'superadmin');
+const empresas    = allUsers.filter((u) => u.role === 'empresa');
+const perfilOk    = students.filter((u) => u.perfilCompleto).length;
+
+const enrollPending  = allEnrollments.filter((e) => e.estado === 'pending').length;
+const enrollApproved = allEnrollments.filter((e) => e.estado === 'approved').length;
+const enrollRejected = allEnrollments.filter((e) => e.estado === 'rejected').length;
+
+const appPending  = allApplications.filter((a) => a.estado === 'pending').length;
+const appAccepted = allApplications.filter((a) => a.estado === 'accepted').length;
+const appRejected = allApplications.filter((a) => a.estado === 'rejected').length;
+
+const activeOpps  = allOpps.filter((o) => o.activo).length;
+
+// Recent registrations (last 10 students)
+const recentUsers = [...students]
+  .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  .slice(0, 10);
+
+function pct(n: number, total: number) {
+  return total === 0 ? '0' : Math.round((n / total) * 100).toString();
+}
+---
+
+<Layout
+  title="Admin — Centro de control · ULS"
+  showNavbar={true}
+  userName={currentUser.nombre}
+  userRole={currentUser.role}
+>
+  <main class="uls-main">
+    <AppPageHeader
+      icon="admin"
+      title="Centro de control"
+      subtitle={`Sesión: ${currentUser.nombre}`}
+      variant="panel"
+      badge={roleLabel}
+      badgeAdmin
+    />
+
+    <!-- ── Module shortcuts ── -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Acceso rápido</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+        <!-- Admin management shortcuts -->
+        <a href="/admin/usuarios"
+          class="bg-indigo-600 rounded-xl border border-indigo-700 shadow-sm p-4 hover:bg-indigo-700 hover:shadow-md transition flex flex-col gap-1">
+          <span class="text-sm font-bold text-white">Gestión de usuarios</span>
+          <span class="text-xs text-indigo-200">Crear estudiantes, docentes, empresas →</span>
+        </a>
+        <a href="/admin/materias"
+          class="bg-blue-600 rounded-xl border border-blue-700 shadow-sm p-4 hover:bg-blue-700 hover:shadow-md transition flex flex-col gap-1">
+          <span class="text-sm font-bold text-white">Asignación de materias</span>
+          <span class="text-xs text-blue-200">Asignar docentes a materias →</span>
+        </a>
+        {accessibleSections.map((section) => (
+          <a href={section.href}
+            class="bg-white rounded-xl border border-slate-100 shadow-sm p-4 hover:border-indigo-300 hover:shadow-md transition flex flex-col gap-1">
+            <span class="text-sm font-bold text-slate-900">{section.label}</span>
+            <span class="text-xs text-indigo-600">Abrir →</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <!-- ── User stats ── -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Usuarios</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-indigo-500 uppercase tracking-wider">Total</span>
+          <span class="text-4xl font-extrabold text-indigo-700">{allUsers.length}</span>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-emerald-500 uppercase tracking-wider">Estudiantes</span>
+          <span class="text-4xl font-extrabold text-emerald-700">{students.length}</span>
+          <span class="text-xs text-emerald-600">{perfilOk} perfil completo</span>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-blue-500 uppercase tracking-wider">Docentes</span>
+          <span class="text-4xl font-extrabold text-blue-700">{docentes.length}</span>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-5 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-amber-500 uppercase tracking-wider">Empresas</span>
+          <span class="text-4xl font-extrabold text-amber-700">{empresas.length}</span>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-5 flex flex-col gap-1">
+          <span class="text-xs font-semibold text-red-500 uppercase tracking-wider">Admins</span>
+          <span class="text-4xl font-extrabold text-red-700">{admins.length}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Wiki / Enrollment stats ── -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Wiki — Inscripciones</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Total materias</p>
+          <p class="text-3xl font-extrabold text-slate-800">{allSubjects.length}</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+          <p class="text-xs text-yellow-600 font-semibold uppercase tracking-wider mb-1">Inscripciones pendientes</p>
+          <p class="text-3xl font-extrabold text-yellow-700">{enrollPending}</p>
+          <a href="/wiki" class="text-xs text-yellow-600 underline mt-1 inline-block">Revisar →</a>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+          <p class="text-xs text-emerald-600 font-semibold uppercase tracking-wider mb-1">Aprobadas</p>
+          <p class="text-3xl font-extrabold text-emerald-700">{enrollApproved}</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-5">
+          <p class="text-xs text-red-500 font-semibold uppercase tracking-wider mb-1">Rechazadas</p>
+          <p class="text-3xl font-extrabold text-red-700">{enrollRejected}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Bridge / Application stats ── -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Bridge — Pasantías</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Oportunidades activas</p>
+          <p class="text-3xl font-extrabold text-slate-800">{activeOpps}</p>
+          <p class="text-xs text-slate-400">{allOpps.length} totales</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5">
+          <p class="text-xs text-yellow-600 font-semibold uppercase tracking-wider mb-1">Aplicaciones pendientes</p>
+          <p class="text-3xl font-extrabold text-yellow-700">{appPending}</p>
+          <a href="/bridge" class="text-xs text-yellow-600 underline mt-1 inline-block">Revisar →</a>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
+          <p class="text-xs text-emerald-600 font-semibold uppercase tracking-wider mb-1">Aceptadas</p>
+          <p class="text-3xl font-extrabold text-emerald-700">{appAccepted}</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-xl p-5">
+          <p class="text-xs text-red-500 font-semibold uppercase tracking-wider mb-1">Rechazadas</p>
+          <p class="text-3xl font-extrabold text-red-700">{appRejected}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Content stats (Notices + Evaluations) ── -->
+    <section class="mb-8">
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Contenido académico</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Avisos publicados</p>
+          <p class="text-3xl font-extrabold text-slate-800">{allNotices.length}</p>
+          <p class="text-xs text-slate-400">{allNotices.filter(n => n.urgente).length} urgentes</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Calificaciones ingresadas</p>
+          <p class="text-3xl font-extrabold text-slate-800">{allEvals.length}</p>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <p class="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Tasa inscripción aprobada</p>
+          <p class="text-3xl font-extrabold text-slate-800">{pct(enrollApproved, allEnrollments.length)}%</p>
+          <p class="text-xs text-slate-400">{allEnrollments.length} total</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Recent registrations ── -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden mb-8">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-bold text-slate-900">Estudiantes recientes</h2>
+        <span class="text-xs text-slate-400">{students.length} total</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Nombre</th>
+              <th class="px-6 py-3">Correo</th>
+              <th class="px-6 py-3">Carrera</th>
+              <th class="px-6 py-3">Ciclo</th>
+              <th class="px-6 py-3">Perfil</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {recentUsers.map((u) => (
+              <tr class={u.id === currentUser.id ? 'bg-indigo-50' : 'hover:bg-slate-50 transition-colors'}>
+                <td class="px-6 py-3 font-semibold text-slate-900">{u.nombre}</td>
+                <td class="px-6 py-3 text-slate-500">{u.email}</td>
+                <td class="px-6 py-3 text-slate-500">{u.carrera ? u.carrera.replace(/^Licenciatura en |^Técnico en |^Ingeniería /,'') : '—'}</td>
+                <td class="px-6 py-3 text-slate-500">{u.ciclo ?? '—'}</td>
+                <td class="px-6 py-3">
+                  {u.perfilCompleto
+                    ? <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Completo</span>
+                    : <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Pendiente</span>
+                  }
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── All users table ── -->
+    <section class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <h2 class="font-bold text-slate-900">Todos los usuarios</h2>
+        <span class="text-xs text-slate-400">{allUsers.length} registrados</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
+            <tr>
+              <th class="px-6 py-3">Nombre</th>
+              <th class="px-6 py-3">Correo</th>
+              <th class="px-6 py-3">Carrera</th>
+              <th class="px-6 py-3">Rol</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {allUsers.map((u) => (
+              <tr class={u.id === currentUser.id ? 'bg-indigo-50' : 'hover:bg-slate-50 transition-colors'}>
+                <td class="px-6 py-3 font-semibold text-slate-900">{u.nombre}</td>
+                <td class="px-6 py-3 text-slate-500">{u.email}</td>
+                <td class="px-6 py-3 text-slate-500">{u.carrera || '—'}</td>
+                <td class="px-6 py-3">
+                  <span class={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                    u.role === 'admin' || u.role === 'superadmin' ? 'bg-red-100 text-red-700' :
+                    u.role === 'docente' ? 'bg-blue-100 text-blue-700' :
+                    u.role === 'empresa' ? 'bg-amber-100 text-amber-700' :
+                    'bg-slate-100 text-slate-600'
+                  }`}>
+                    {getRoleLabel(u.role)}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</Layout>

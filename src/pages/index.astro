@@ -1,11 +1,187 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+export const prerender = false;
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import Layout from '../layouts/Layout.astro';
+import SiteLogo from '../components/shared/SiteLogo.astro';
+import UniversityLogo from '../components/shared/UniversityLogo.astro';
+import UlsIcon from '../components/shared/UlsIcon.astro';
+import OpportunityCarousel from '../components/landing/OpportunityCarousel';
+import { BRAND, CONTACT, ASSETS } from '../lib/branding';
+import { db, Opportunity } from 'astro:db';
+
+const allOpportunities = await db.select().from(Opportunity).all();
+const previewOpportunities = allOpportunities
+  .filter((o) => o.activo)
+  .slice(0, 12)
+  .map((o) => ({
+    id: o.id,
+    titulo: o.titulo,
+    empresa: o.empresa,
+    ubicacion: o.ubicacion,
+    tipo: o.tipo,
+  }));
 ---
 
-<Layout>
-	<Welcome />
+<Layout title={`${BRAND.siteName} — ${BRAND.university}`} showNavbar={false}>
+  <div class="landing-page">
+    <header class="landing-topbar">
+      <div class="landing-topbar-inner">
+        <a href="/" class="landing-brand-row" aria-label="Edunexus inicio">
+          <SiteLogo variant="light" height={34} />
+          <span class="landing-brand-divider" aria-hidden="true"></span>
+          <UniversityLogo variant="light" height={40} />
+        </a>
+        <div class="flex items-center gap-2 sm:gap-3">
+          <a href="/auth/login" class="uls-btn uls-btn-ghost-glass text-sm">Iniciar sesión</a>
+          <a href="/auth/register" class="landing-btn-white text-sm !py-2.5">Crear cuenta</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="landing-hero">
+      <div class="landing-hero-bg" aria-hidden="true"></div>
+      <img
+        src={ASSETS.heroImage}
+        alt=""
+        class="landing-hero-photo"
+        aria-hidden="true"
+      />
+      <div class="landing-hero-inner">
+        <div class="landing-hero-copy">
+          <h1>
+            <span class="landing-hero-word block">Tu éxito académico</span>
+            <span class="landing-hero-word block">y profesional</span>
+            <span class="landing-hero-word block"></span>
+          </h1>
+          <div class="landing-hero-actions">
+            <a href="#vacantes" class="landing-btn-white">Encuentra trabajo</a>
+            <a href="#empresas" class="landing-btn-white">Postula vacantes</a>
+          </div>
+          <div class="landing-partners">
+            <UniversityLogo variant="light" height={36} />
+            <span class="text-sm text-slate-200">{BRAND.university}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-panel-showcase" aria-labelledby="paneles-edunexus">
+      <div class="landing-panel-showcase-inner">
+        <div class="landing-panel-intro">
+          <p class="text-sm font-semibold uppercase tracking-widest text-slate-400">Paneles del sistema</p>
+          <h2 id="paneles-edunexus" class="uls-display text-3xl md:text-4xl font-bold text-white mt-2">
+            Explora las áreas principales de Edunexus
+          </h2>
+          <p class="text-slate-300 mt-4 max-w-2xl">
+            Cada panel concentra una parte clave de la experiencia: gestión académica, asistencia inteligente,
+            oportunidades profesionales y seguimiento personal.
+          </p>
+        </div>
+
+        <div class="panel-menu-container">
+          <input type="checkbox" id="panel-menu" class="panel-menu-toggle" aria-label="Activar paneles" />
+          <label for="panel-menu" class="panel-menu-trigger" aria-hidden="true">
+            <span></span>
+          </label>
+
+          <div class="panel-menu-box">
+            <a href="/wiki" class="panel-menu-item panel-menu-item-1">
+              <span class="panel-menu-icon"><UlsIcon name="wiki" class="w-5 h-5" /></span>
+              <span>
+                <strong>{BRAND.wiki.title}</strong>
+                <small>{BRAND.wiki.subtitle}</small>
+              </span>
+            </a>
+            <a href="/concierge" class="panel-menu-item panel-menu-item-2">
+              <span class="panel-menu-icon"><UlsIcon name="lia" class="w-5 h-5" /></span>
+              <span>
+                <strong>{BRAND.assistant.name}</strong>
+                <small>{BRAND.assistant.subtitle}</small>
+              </span>
+            </a>
+            <a href="/bridge" class="panel-menu-item panel-menu-item-3">
+              <span class="panel-menu-icon"><UlsIcon name="bridge" class="w-5 h-5" /></span>
+              <span>
+                <strong>{BRAND.bridge.title}</strong>
+                <small>{BRAND.bridge.subtitle}</small>
+              </span>
+            </a>
+            <a href="/dashboard" class="panel-menu-item panel-menu-item-4">
+              <span class="panel-menu-icon"><UlsIcon name="panel" class="w-5 h-5" /></span>
+              <span>
+                <strong>{BRAND.panel.title}</strong>
+                <small>{BRAND.panel.subtitle}</small>
+              </span>
+            </a>
+            <div class="panel-menu-move-item" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vacantes" class="landing-carousel-section">
+      <OpportunityCarousel client:load items={previewOpportunities} />
+    </section>
+
+    <section class="landing-audience">
+      <div class="landing-audience-panel landing-audience-panel-candidate">
+        <img src={ASSETS.heroImage} alt="" class="landing-audience-bg" aria-hidden="true" />
+        <div class="landing-audience-inner">
+          <h2 class="landing-audience-kicker">Aplica a cientos de vacantes</h2>
+          <p class="landing-audience-text">
+            Genera tu curriculum, conecta con empresas e impulsa tu carrera profesional desde Wiki, Lía y Bridge.
+          </p>
+          <a href="/auth/register" class="landing-audience-btn landing-audience-btn-light">
+            Regístrate como candidato
+            <UlsIcon name="arrow-right" class="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+
+      <div id="empresas" class="landing-audience-panel landing-audience-panel-company">
+        <div class="landing-audience-inner">
+          <h2 class="landing-audience-kicker">
+            Descubre el<br />talento ideal<br />para tu equipo
+          </h2>
+          <p class="landing-audience-text">
+            Crea tu cuenta empresarial y encuentra al candidato ideal para tus vacantes a través de Bridge.
+          </p>
+          <a href={`mailto:${CONTACT.email}?subject=Registro%20empresa%20Bridge`} class="landing-audience-btn landing-audience-btn-dark">
+            Regístrate como empresa
+            <UlsIcon name="building" class="w-4 h-4" />
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer class="landing-footer">
+      <div class="landing-footer-inner">
+        <div>
+          <SiteLogo variant="light" height={32} />
+          <p class="mt-4 text-sm text-slate-400 max-w-xs">
+            {BRAND.siteName} — plataforma académica y profesional de la {BRAND.university}.
+          </p>
+        </div>
+        <div>
+          <p class="landing-footer-title">Encuentra vacantes de</p>
+          <ul class="space-y-2 text-sm">
+            <li>Pasantías y micro-pasantías</li>
+            <li>Proyectos con empresas</li>
+            <li>Oportunidades por carrera</li>
+          </ul>
+        </div>
+        <div>
+          <p class="landing-footer-title">Contacto</p>
+          <ul class="space-y-2 text-sm">
+            <li><a href={`mailto:${CONTACT.email}`} class="landing-footer-link">{CONTACT.email}</a></li>
+            <li>{CONTACT.phone}</li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-center text-xs text-slate-500 mt-8 px-4">
+        © 2026 {BRAND.siteName}. Todos los derechos reservados — {BRAND.university}
+      </p>
+    </footer>
+  </div>
 </Layout>
+
