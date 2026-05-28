@@ -9,7 +9,7 @@
     "dev": "node scripts/dev-persistent.mjs",
     "dev:fresh": "node scripts/force-reset-db.mjs && node scripts/dev-persistent.mjs",
     "build": "astro build",
-    "build:prod": "astro build --remote",
+    "build:prod": "astro build",
     "preview": "astro preview",
     "astro": "astro",
     "db:setup": "node scripts/setup-persistent-db.mjs",
