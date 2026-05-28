@@ -1,10 +1,31 @@
 // @ts-check
 import { defineConfig, envField } from 'astro/config';
+import { fileURLToPath } from 'node:url';
 
 import react from '@astrojs/react';
 import db from '@astrojs/db';
 import tailwindcss from '@tailwindcss/vite';
 import netlify from '@astrojs/netlify';
+
+/**
+ * When ASTRO_DB_REMOTE_URL is set (e.g. Netlify build with Turso) we intercept
+ * the `astro:db` virtual module BEFORE @astrojs/db can serve it and replace it
+ * with our own drop-in that connects directly to Turso via @libsql/client.
+ *
+ * @astrojs/db v0.13 only supports remote connections through Astro Studio
+ * (which is shut down). This plugin bypasses that entirely.
+ */
+const tursoDbPlugin = process.env.ASTRO_DB_REMOTE_URL
+  ? /** @type {import('vite').Plugin} */ ({
+      name: 'turso-db-direct',
+      enforce: 'pre',
+      resolveId(id) {
+        if (id === 'astro:db') {
+          return fileURLToPath(new URL('./src/lib/db-compat.ts', import.meta.url));
+        }
+      },
+    })
+  : null;
 
 // https://astro.build/config
 export default defineConfig({
@@ -36,7 +57,7 @@ export default defineConfig({
   },
 
   vite: {
-    plugins: [tailwindcss()],
+    plugins: [tailwindcss(), ...(tursoDbPlugin ? [tursoDbPlugin] : [])],
     optimizeDeps: {
       exclude: ['astro:db'],
     },
